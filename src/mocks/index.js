@@ -29,7 +29,7 @@ Mock.mock(`${api}getfood`, 'get', (req) => {
                         rate: '@integer(1,5)',
                         sales: '@integer(100, 1500)',
                         price: '@integer(10, 100)',
-                        img_src: '@image(100x100, @color())'
+                        img_src: '@dataImage(100x100, mock)'
                     }
                 ]
             }
@@ -48,7 +48,7 @@ Mock.mock(`${api}getorder`, 'get', (req) => {
                 order_date: '@date(yyyy-MM-dd HH:mm)',
                 status: '订单已完成',
                 pay: '@integer(10, 100)',
-                img_src: '@image(100x100, @color())'
+                img_src: '@dataImage(100x100, mock)'
             }
         ]
     })
