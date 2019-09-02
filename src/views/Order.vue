@@ -107,7 +107,7 @@
                         <h3 class="cate_title">{{item.cateTitle}}</h3>
                         <ul class="food_list clearfix">
                             <li class="food_item" v-for="(food, foodIndex) in item.foodList" :key="foodIndex">
-                                <img :src="food.img_src" alt="菜卷" />
+                                <img :src="food.img_src" />
                                 <div class="food_info">
                                     <p class="food_name">{{food.foodName}}</p>
                                     <div class="foot_rate">
@@ -316,7 +316,7 @@ export default {
                 console.log(this.cartList)
             }
         },
-        listenScroll(){ //监听滚动条
+        listenScroll(){ //绑定滚动条
             let cates = document.querySelectorAll('.food_cate_item')
             this.cateListToPageTop = this.getElementToPageTop(document.querySelector('.food_cate_list'))
             window.addEventListener('scroll', this.handleScroll, true);  // 监听（绑定）滚轮滚动事件
