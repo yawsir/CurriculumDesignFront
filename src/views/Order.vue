@@ -107,7 +107,7 @@
                         <h3 class="cate_title">{{item.cateTitle}}</h3>
                         <ul class="food_list clearfix">
                             <li class="food_item" v-for="(food, foodIndex) in item.foodList" :key="foodIndex">
-                                <img :src="food.img_src" />
+                                <img :src="food.img_src" @click="getComments(food)"/>
                                 <div class="food_info">
                                     <p class="food_name">{{food.foodName}}</p>
                                     <div class="foot_rate">
@@ -178,20 +178,26 @@
                 </div>
             </div>
         </div>
+
+        <div class="cover" v-show="commentsShow"></div>
+        <food-comments :clickClose="clickCommentsClose" 
+        :addToCart="addToCart"
+        v-show="commentsShow" :food="clickFood"
+        
+        ></food-comments>
     </div>
 </template>
 
 <script>
 import Interface from '../config/interface.js'
+import FoodComments from '../components/FoodComments.vue'
 const api = Interface.mockApi
 export default {
     name: "Orders",
     data() {
         return {
             command: "defaultSort",
-            dataList: [
-               
-            ],
+            dataList: [],
             currentCateIndex: 0, //当前选中的分类索引
             showAside: false,
             cateListToPageTop: 0,    //菜单列表距离文档顶部的距离
@@ -200,8 +206,10 @@ export default {
             boxesFee: 1,            //餐盒费
             shippingFee: 3,         //配送费
             sendingFee: 15,          //起送费
-            api
-        };
+            api,
+            commentsShow: false,     //控制评论弹窗
+            clickFood: {}      //点击的食品 传给FoodComments组件 获取评论
+        };  
     },
     methods: {
         handleCommand(command) {    //点击排序
@@ -333,6 +341,15 @@ export default {
                 this.dataList = res.data.list
                 
             })
+        },
+        clickCommentsClose(){
+            this.commentsShow = !this.commentsShow
+        },
+        getComments(food){
+            console.log(food)
+            this.commentsShow = !this.commentsShow
+            // this.commentsOption.foodIndex = foodIndex
+            this.clickFood = food
         }
     },
     computed: {
@@ -356,7 +373,9 @@ export default {
         },
         
     },
-
+    components: {
+        FoodComments
+    },
     mounted(){
         this.$emit('subMenuOpen', '/home/order')       //使首页导航栏更新
         this.getFoodList()
@@ -364,6 +383,7 @@ export default {
     updated(){
         this.listenScroll()
     }
+    
 };
 </script>
 
@@ -720,6 +740,16 @@ export default {
             }
         }
     }
+}
+
+.cover{
+    background: #B3B3B477;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 10;
 }
 </style>
 

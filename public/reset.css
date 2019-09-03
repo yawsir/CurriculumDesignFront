@@ -33,7 +33,9 @@ footer, header, hgroup, main, menu, nav, section {
 
 body {
   line-height: 1; 
-  overflow-y: scroll;}
+  overflow-y: scroll;
+  min-width: 1080px;
+}
 
 ol, ul {
   list-style: none; }

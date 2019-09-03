@@ -2,21 +2,26 @@
     <div id="login">
         <div class="container" :class="{'right-panel-active': rightPanelActive}">
             <div class="form-container sign-up-container">
-                <form action="#">
+                <form>
                     <span>注册属于你的账号</span>
-                    <input type="text" placeholder="账号" required/>
-                    <input type="password" placeholder="密码" required/>
-                    <input type="password" placeholder="确认密码" required/>
-                    <button @click="doSignUp">注册</button>
+                    <input type="text" v-model="signUp.account" placeholder="账号" required/>
+                    <p class="tip account-tip">{{signUpAccountTip}}</p>
+                    <input type="password" v-model="signUp.pwd" placeholder="密码" required/>
+                    <p class="tip pwd-tip">{{signUpPwdTip}}</p>
+                    <input type="password" v-model="signUp.confirmPwd" placeholder="确认密码" required/>
+                    <p class="tip confirm-pwd-tip">{{signUpConfirmPwdTip}}</p>
                 </form>
+                <button @click="doSignUp" :disabled="!isSignUpVerifyPass">注册</button>
             </div>
             <div class="form-container sign-in-container">
-                <form action="#">
+                <form>
                     <span>登录您的账号</span>
-                    <input type="text" placeholder="账号" required/>
-                    <input type="password" placeholder="密码" required/>
-                    <button @click="doSignIn">登录</button>
+                    <input type="text" v-model="signIn.account" placeholder="账号" required/>
+                    <p class="tip">{{signInAccountTip}}</p>
+                    <input type="password" v-model="signIn.pwd" placeholder="密码" required/>
+                    <p class="tip">{{signInPwdTip}}</p>
                 </form>
+                <button @click="doSignIn" :disabled="!isSignInVerifyPass">登录</button>
             </div>
             <div class="overlay-container">
                 <div class="overlay">
@@ -33,6 +38,9 @@
                 </div>
             </div>
         </div>
+        <div id="TencentCaptcha"
+            type="button">
+        </div>
     </div>
 </template>
 
@@ -43,7 +51,18 @@ export default {
 
     data() {
         return {
-            rightPanelActive: false
+            rightPanelActive: false,//注册登录页面的切换
+            
+            signIn: {
+                account: '',          //登录时填写的账号
+                pwd: '',             //登录时填写的密码
+            },
+            signUp: {
+                account: '',          //注册填写的账号
+                pwd: '',              //注册填写的密码
+                confirmPwd: '',      //注册填写的确认密码
+            },
+
         }
     },
     methods: {
@@ -52,11 +71,85 @@ export default {
         },
         doSignIn(){
             // alert('登录')
-            this.$router.push({path: '/home/order'})
+            // this.$router.push({path: '/home/order'})
+            if(this.isSignInVerifyPass){
+                //弹出滑动验证码
+                this.getVerification((res) => {
+                    if(res.ret == 0){
+                        console.log('验证成功')
+                        this.$router.push({path: '/home/order'})
+                    }
+                })
+            }
         },
-        doSignUp(){
-            // alert('注册')
+        doSignUp(){ //点击注册
+            if(this.isSignUpVerifyPass){
+                //弹出滑动验证码
+                this.getVerification((res) => {
+                    if(res.ret == 0){
+                        console.log('验证成功')
+                    }
+                })
+            }
+            
+        },
+        //弹出验证码
+        getVerification(callback, options){
+            new TencentCaptcha('2015742382',callback,options).show()
+        },
+        preventSubmit(){    //阻止表单的默认提交行为
+            return false
         }
+
+    },
+    computed: {
+        signUpConfirmPwdTip(){    //注册账号的提示
+            if(!this.signUp.confirmPwd){
+                return '确认密码不能为空'
+            }
+            if(this.signUp.pwd !== this.signUp.confirmPwd){
+                return '两次输入的密码不同'
+            }
+            return ''
+        },
+        signUpPwdTip(){           //注册密码的提示
+            if(!this.signUp.pwd){
+                return '密码不能为空'
+            }
+            return ''
+        },
+        signUpAccountTip(){       //注册确认密码的提示
+            if(!this.signUp.account){
+                return '账号不能为空'
+            }
+            return ''
+        },
+        isSignUpVerifyPass(){      //注册验证是否通过
+            if(this.signUpPwdTip || this.signUpConfirmPwdTip || this.signUpAccountTip){
+                return false
+            }
+            return true
+        },
+        signInAccountTip(){      //登录账号提示
+            if(!this.signIn.account){
+                return '账号不能为空'
+            }
+            return ''
+        },
+        signInPwdTip(){     //登录密码提示
+            if(!this.signIn.pwd){
+                return '密码不能为空'
+            }
+            return ''
+        },
+        isSignInVerifyPass(){
+            if(this.signInAccountTip || this.signInPwdTip){
+                return false
+            }
+            return true
+        }
+    },
+    mounted(){
     }
 };
 </script>
@@ -125,6 +218,16 @@ a {
     justify-content: center;
     align-items: center;
     text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+.form-container button{
+    position: absolute;
+    bottom: 10%;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .social-container {
@@ -161,7 +264,7 @@ button {
     padding: 12px 45px;
     letter-spacing: 1px;
     text-transform: uppercase;
-    transition: transform 80ms ease-in;
+    /* transition: transform 80ms ease-in; */
 }
 
 input[type=text] {
@@ -179,6 +282,14 @@ input[type=text] {
     color: #fff;
     font-weight: bold;
 }
+.tip{
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    color: #f00;
+    margin: 0;
+}
+
+
 
 input[type=password] {
     width: 240px;
@@ -211,19 +322,27 @@ input[type=email] {
     font-weight: bold;
 }
 
-button:active {
-    transform: scale(0.95);
+
+button:hover {
+    background: #ff5b3e;
+}
+button:active{
+    background: #f13412;
 }
 
 button:focus {
     outline: none;
 }
+button:disabled{
+    background: #cdcdcd;
+    border: #cdcdcd;
+}
 
-button.ghost {
+/* button.ghost {
     background: transparent;
     border-color: #ff4b2b;
     background-color: #ff4b2b
-}
+} */
 
 .form-container {
     position: absolute;

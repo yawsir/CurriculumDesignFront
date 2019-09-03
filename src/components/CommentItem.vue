@@ -1,0 +1,61 @@
+<template>
+    <div class="comment-item">
+        <div class="user-info">
+            <img src="../assets/images/3.jpg" alt class="user-avator" />
+        </div>
+        <div class="user-comment">
+            <p class="user-name">sfsafsfsfsfsafs</p>
+            <div class="food-rate">
+                <el-rate :value="3" :max="5" disabled text-color="#ff9900"></el-rate>
+            </div>
+            <p class="food-comment">就老萨老反思吴芳姐撒否定:</p>
+            <p class="comment-date">2019-01-02</p>
+        </div>
+    </div>
+</template>
+
+
+<script>
+export default {
+    name: "comment-item",
+
+    data() {
+        return {};
+    },
+    methods: {}
+};
+</script>
+
+
+<style lang="scss" scoped>
+.comment-item {
+    width: 100%;
+    display: flex;
+    border-bottom: 1px solid $LEVEL_1_BORDER;
+    .user-info{
+        .user-avator{
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+        
+    }
+    .user-comment{
+        flex-grow: 1;
+        margin-left: 10px; 
+        font-size: 12px;
+        color: $SECONDARY_TEXT;
+        .food-rate{
+            margin: 3px 0;
+        }
+        .food-comment{
+            padding-bottom: 3px;
+            color: $MAIN_TEXT;
+        }
+        .comment-date{
+            text-align: right;
+            padding-right: 5px;
+        }
+    }
+}
+</style>

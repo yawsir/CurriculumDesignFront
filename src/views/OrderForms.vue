@@ -5,7 +5,6 @@
                 <li class="title_item">下单时间</li>
                 <li class="title_item">订单内容</li>
                 <li class="title_item">支付金额(元)</li>
-                <li class="title_item">状态</li>
                 <li class="title_item">操作</li>
             </ul>
         </div>
@@ -23,7 +22,6 @@
                             </div>
                         </li>
                         <li class="item_pay">{{item.pay}}</li>
-                        <li class="item_status">{{item.status}}</li>
                         <li class="item_operate">
                             <el-button type="info" size="mini" plain>查看详情</el-button>
                         </li>
