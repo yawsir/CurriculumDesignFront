@@ -7,10 +7,7 @@ const personChildren = [
         path: 'account', 
         component: () => import('../views/Account.vue') 
     },
-    {
-        path: 'favourite', 
-        component: () => import('../views/Favourite.vue') 
-    },
+    
     {
         path: 'orderdetail',
         component: () => import('../views/OrderDetail.vue')

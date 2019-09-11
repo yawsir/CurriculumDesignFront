@@ -322,6 +322,7 @@ export default {
                 alert("未达到起送价")
             }else{
                 console.log(this.cartList)
+                this.$router.push({path: '/pay'})
             }
         },
         listenScroll(){ //绑定滚动条
@@ -338,8 +339,8 @@ export default {
             this.$http.get(this.api+ 'getfood')
             .then((res) => {
                 console.log(res)
-                this.dataList = res.data.list
-                
+                this.dataList = res.data.cateList
+
             })
         },
         clickCommentsClose(){

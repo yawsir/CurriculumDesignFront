@@ -1,43 +1,74 @@
 <template>
     <div id="login">
-        <div class="container" :class="{'right-panel-active': rightPanelActive}">
-            <div class="form-container sign-up-container">
-                <form>
-                    <span>注册属于你的账号</span>
-                    <input type="text" v-model="signUp.account" placeholder="账号" required/>
-                    <p class="tip account-tip">{{signUpAccountTip}}</p>
-                    <input type="password" v-model="signUp.pwd" placeholder="密码" required/>
-                    <p class="tip pwd-tip">{{signUpPwdTip}}</p>
-                    <input type="password" v-model="signUp.confirmPwd" placeholder="确认密码" required/>
-                    <p class="tip confirm-pwd-tip">{{signUpConfirmPwdTip}}</p>
-                </form>
-                <button @click="doSignUp" :disabled="!isSignUpVerifyPass">注册</button>
-            </div>
-            <div class="form-container sign-in-container">
-                <form>
-                    <span>登录您的账号</span>
-                    <input type="text" v-model="signIn.account" placeholder="账号" required/>
-                    <p class="tip">{{signInAccountTip}}</p>
-                    <input type="password" v-model="signIn.pwd" placeholder="密码" required/>
-                    <p class="tip">{{signInPwdTip}}</p>
-                </form>
-                <button @click="doSignIn" :disabled="!isSignInVerifyPass">登录</button>
-            </div>
-            <div class="overlay-container">
-                <div class="overlay">
-                    <div class="overlay-panel overlay-left">
-                        <h1>欢迎回来</h1>
-                        <p>与我们保持联系请登录您的个人信息</p>
-                        <button class="ghost" id="signIn" @click="switchMode">登录</button>
-                    </div>
-                    <div class="overlay-panel overlay-right">
-                        <h1>欢迎光临</h1>
-                        <p>输入您的个人资料，并与我们一起开始旅程</p>
-                        <button class="ghost" id="signUp" @click="switchMode">注册</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div class="login-wrap">
+		<div class="login-html">
+			<input id="tab-1" type="radio" name="tab" class="sign-in" checked /><label for="tab-1" class="tab">登录</label>
+			<input id="tab-2" type="radio" name="tab" class="sign-up" /><label for="tab-2" class="tab">注册</label>
+			<div class="login-form">
+				<div class="sign-in-htm">
+                    <form id="signInForm" @submit.prevent="signInFormSubmit">
+                        <div class="group">
+                            <label for="sign-in-user" class="label">用户名</label>
+                            <input id="sign-in-user" type="text" class="input" v-model="signInInfo.account" required />
+                        </div>
+                        <div class="group">
+                            <label for="sign-in-pass" class="label">密码</label>
+                            <input id="sign-in-pass" type="password" class="input" v-model="signInInfo.pwd" data-type="password" required/>
+                        </div>
+                        <div class="group">
+                            <input type="submit" class="button" value="登录" />
+                        </div>
+                    </form>
+					<div class="hr"></div>
+					<div class="foot-lnk">
+						<a href="#forgot">忘记密码?</a>
+					</div>
+				</div>
+				<div class="sign-up-htm">
+                    <form id="signUpForm" @submit.prevent="signUpFormSubmit">
+					<div class="group">
+						<label for="user" class="label">用户名</label>
+						<input id="user" type="text" class="input" v-model="signUpInfo.account" required/>
+					</div>
+					<div class="group">
+						<label for="realname" class="label">年龄</label>
+						<input id="realname" type="number" class="input" v-model="signUpInfo.age" required/>
+					</div>
+					<div class="group">
+						<span class="sex-label">性别</span>
+                        <div class="sex-radio">
+                            <el-radio-group v-model="signUpInfo.sex">
+                                <el-radio :label="1">男</el-radio>
+                                <el-radio :label="0">女</el-radio>
+                            </el-radio-group>
+                        </div>
+					</div>
+                    <div class="group">
+						<label for="email" class="label">邮箱</label>
+						<input id="email" type="email" class="input" v-model="signUpInfo.email" required/>
+					</div>
+                    <div class="group">
+						<label for="tel" class="label">电话号码</label>
+						<input id="tel" type="tel" class="input" v-model="signUpInfo.tel" required/>
+					</div>
+					<div class="group">
+						<label for="pass" class="label">密码</label>
+						<input id="pass" type="password" class="input" data-type="password" v-model="signUpInfo.pwd" required/>
+					</div>
+					<div class="group">
+						<label for="cf-pass" class="label">确认密码</label>
+                        <input id="cf-pass" type="password" class="input" data-type="password" v-model="signUpInfo.confirmPwd" required/>
+					</div>
+					
+					<div class="group">
+						<input type="submit" class="button" value="注册" />
+					</div>
+                    </form>
+					<div class="hr"></div>
+				</div>
+			</div>
+		</div>
+	</div>
         <div id="TencentCaptcha"
             type="button">
         </div>
@@ -53,45 +84,40 @@ export default {
         return {
             rightPanelActive: false,//注册登录页面的切换
             
-            signIn: {
+            signInInfo: {
                 account: '',          //登录时填写的账号
                 pwd: '',             //登录时填写的密码
             },
-            signUp: {
-                account: '',          //注册填写的账号
-                pwd: '',              //注册填写的密码
-                confirmPwd: '',      //注册填写的确认密码
+            signUpInfo: {
+                account: '',
+                age: '',
+                email: '',
+                tel: '',
+                sex: 1, 	//0男 1女         
+                pwd: '',
+                confirmPwd: '',     
+
             },
 
         }
     },
     methods: {
-        switchMode(){
-            this.rightPanelActive = !this.rightPanelActive
+        signInFormSubmit(){
+            // console.log(this.signInInfo)
+            this.getVerification((res) => {
+                if(res.ret == 0){
+                    console.log('验证成功')
+                    this.$router.push({path: '/home/order'})
+                }
+            })
         },
-        doSignIn(){
-            // alert('登录')
-            // this.$router.push({path: '/home/order'})
-            if(this.isSignInVerifyPass){
-                //弹出滑动验证码
-                this.getVerification((res) => {
-                    if(res.ret == 0){
-                        console.log('验证成功')
-                        this.$router.push({path: '/home/order'})
-                    }
-                })
-            }
-        },
-        doSignUp(){ //点击注册
-            if(this.isSignUpVerifyPass){
-                //弹出滑动验证码
-                this.getVerification((res) => {
-                    if(res.ret == 0){
-                        console.log('验证成功')
-                    }
-                })
-            }
-            
+        signUpFormSubmit(){
+            this.getVerification((res) => {
+                if(res.ret == 0){
+                    console.log('验证成功')
+                    // this.$router.push({path: '/home/order'})
+                }
+            })
         },
         //弹出验证码
         getVerification(callback, options){
@@ -103,51 +129,6 @@ export default {
 
     },
     computed: {
-        signUpConfirmPwdTip(){    //注册账号的提示
-            if(!this.signUp.confirmPwd){
-                return '确认密码不能为空'
-            }
-            if(this.signUp.pwd !== this.signUp.confirmPwd){
-                return '两次输入的密码不同'
-            }
-            return ''
-        },
-        signUpPwdTip(){           //注册密码的提示
-            if(!this.signUp.pwd){
-                return '密码不能为空'
-            }
-            return ''
-        },
-        signUpAccountTip(){       //注册确认密码的提示
-            if(!this.signUp.account){
-                return '账号不能为空'
-            }
-            return ''
-        },
-        isSignUpVerifyPass(){      //注册验证是否通过
-            if(this.signUpPwdTip || this.signUpConfirmPwdTip || this.signUpAccountTip){
-                return false
-            }
-            return true
-        },
-        signInAccountTip(){      //登录账号提示
-            if(!this.signIn.account){
-                return '账号不能为空'
-            }
-            return ''
-        },
-        signInPwdTip(){     //登录密码提示
-            if(!this.signIn.pwd){
-                return '密码不能为空'
-            }
-            return ''
-        },
-        isSignInVerifyPass(){
-            if(this.signInAccountTip || this.signInPwdTip){
-                return false
-            }
-            return true
-        }
     },
     mounted(){
     }
@@ -156,290 +137,188 @@ export default {
 
 
 <style scoped>
-*{
-    box-sizing: border-box;
-}
+    *,:after,:before{box-sizing:border-box}
+.clearfix:after,.clearfix:before{content:'';display:table}
+.clearfix:after{clear:both;display:block}
 #login{
-    font-family: 'Montserrat', sans-serif;
-    background: #f6f5f7;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background: url('../assets/images/loginBg.png');
-    background-size: cover;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    color:#6a6f8c;
+	font:600 16px/18px 'Open Sans',sans-serif;
 }
-h1 {
-    font-weight: bold;
-    margin: 0;
-    color: beige;
+a{color:inherit;text-decoration:none;}
+input, button {
+  outline: none;
+  border: none;
 }
-
-p {
-    font-size: 14px;
-    font-weight: bold;
-    line-height: 20px;
-    letter-spacing: 0.5px;
-    margin: 20px 0 30px;
+.login-wrap{
+	width:100%;
+	margin:auto;
+	max-width:525px;
+	min-height:670px;
+	position:relative;
+	background:url(../assets/images/loginBg.jpg) no-repeat center;
+	box-shadow:0 12px 15px 0 rgba(0,0,0,.24),0 17px 50px 0 rgba(0,0,0,.19);
 }
-
-span {
+.login-html{
+	width:100%;
+	height:100%;
+	position:absolute;
+	padding:90px 70px 50px 70px;
+	background:rgba(40,57,101,.9);
+}
+.login-html .sign-in-htm,
+.login-html .sign-up-htm{
+	top:0;
+	left:0;
+	right:0;
+	bottom:0;
+	position:absolute;
+	-webkit-transform:rotateY(180deg);
+	        transform:rotateY(180deg);
+	-webkit-backface-visibility:hidden;
+	        backface-visibility:hidden;
+	-webkit-transition:all .4s linear;
+	        transition:all .4s linear;
+}
+.login-html .sign-in,
+.login-html .sign-up,
+.login-form .group .check{
+	display:none;
+}
+.login-html .tab,
+.login-form .group .label,
+.login-form .group .button{
+	text-transform:uppercase;
+}
+.login-form .group .label{
+    text-align: left;
+}
+.login-form .group .sex-label{
+    color: #aaa;
     font-size: 12px;
-    color: beige;
+    display: inline-block;
+   position: relative;
+   right: 128px;
+}
+.login-form .group .sex-radio{
+     position: relative;
+   right: 85px;
+   display: inline-block;
+}
+.login-html .tab{
+	font-size:22px;
+	margin-right:15px;
+	padding-bottom:5px;
+	margin:0 15px 10px 0;
+	display:inline-block;
+	border-bottom:2px solid transparent;
+}
+.login-html .sign-in:checked + .tab,
+.login-html .sign-up:checked + .tab{
+	color:#fff;
+	border-color:#1161ee;
+}
+.login-form{
+	min-height:345px;
+	position:relative;
+	-webkit-perspective:1000px;
+	        perspective:1000px;
+	-webkit-transform-style:preserve-3d;
+	        transform-style:preserve-3d;
+}
+.login-form .group{
+	margin-bottom:15px;
+}
+.login-form .group .label,
+.login-form .group .input,
+.login-form .group .button{
+	width:100%;
+	color:#fff;
+	display:block;
+}
+.login-form .group .input,
+.login-form .group .button{
+	border:none;
+	padding:5px 20px;
+	border-radius:25px;
+	background:rgba(255,255,255,.1);
+}
+.login-form .group input[data-type="password"]{
+	/* text-security:circle; */
+	-webkit-text-security:circle;
+}
+.login-form .group .label{
+	color:#aaa;
+	font-size:12px;
+}
+.login-form .group .button{
+	background:#1161ee;
+}
+.login-form .group label .icon{
+	width:15px;
+	height:15px;
+	border-radius:2px;
+	position:relative;
+	display:inline-block;
+	background:rgba(255,255,255,.1);
+}
+.login-form .group label .icon:before,
+.login-form .group label .icon:after{
+	content:'';
+	width:10px;
+	height:2px;
+	background:#fff;
+	position:absolute;
+	-webkit-transition:all .2s ease-in-out 0s;
+	        transition:all .2s ease-in-out 0s;
+}
+.login-form .group label .icon:before{
+	left:3px;
+	width:5px;
+	bottom:6px;
+	-webkit-transform:scale(0) rotate(0);
+	    -ms-transform:scale(0) rotate(0);
+	        transform:scale(0) rotate(0);
+}
+.login-form .group label .icon:after{
+	top:6px;
+	right:0;
+	-webkit-transform:scale(0) rotate(0);
+	    -ms-transform:scale(0) rotate(0);
+	        transform:scale(0) rotate(0);
+}
+.login-form .group .check:checked + label{
+	color:#fff;
+}
+.login-form .group .check:checked + label .icon{
+	background:#1161ee;
+}
+.login-form .group .check:checked + label .icon:before{
+	-webkit-transform:scale(1) rotate(45deg);
+	    -ms-transform:scale(1) rotate(45deg);
+	        transform:scale(1) rotate(45deg);
+}
+.login-form .group .check:checked + label .icon:after{
+	-webkit-transform:scale(1) rotate(-45deg);
+	    -ms-transform:scale(1) rotate(-45deg);
+	        transform:scale(1) rotate(-45deg);
+}
+.login-html .sign-in:checked + .tab + .sign-up + .tab + .login-form .sign-in-htm{
+	-webkit-transform:rotate(0);
+	    -ms-transform:rotate(0);
+	        transform:rotate(0);
+}
+.login-html .sign-up:checked + .tab + .login-form .sign-up-htm{
+	-webkit-transform:rotate(0);
+	    -ms-transform:rotate(0);
+	        transform:rotate(0);
 }
 
-a {
-    color: #fff;
-    font-size: 14px;
-    text-decoration: none;
-    margin: 15px 0;
+.hr{
+	height:2px;
+	margin:60px 0 50px 0;
+	background:rgba(255,255,255,.2);
 }
-.container {
-    border-radius: 10px;
-    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
-    position: relative;
-    overflow: hidden;
-    width: 768px;
-    max-width: 100%;
-    min-height: 480px;
-    opacity: 0.8;
-}
-
-.form-container form {
-    background: rgba(45, 52, 54, 1.0);
-    display: flex;
-    flex-direction: column;
-    padding: 0 50px;
-    height: 100%;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
-}
-.form-container button{
-    position: absolute;
-    bottom: 10%;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-.social-container {
-    margin: 20px 0;
-}
-
-.social-container a {
-    border: 1px solid #ddd;
-    border-radius: 50%;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 5px;
-    height: 40px;
-    width: 40px;
-}
-
-
-.form-container input {
-    background: #eee;
-    border: none;
-    padding: 12px 15px;
-    margin: 8px 0;
-    width: 100%;
-}
-
-button {
-    border-radius: 20px;
-    border: 1px solid #ff4b2b;
-    background: #ff4b2b;
-    color: #fff;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 12px 45px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    /* transition: transform 80ms ease-in; */
-}
-
-input[type=text] {
-    width: 240px;
-    text-align: center;
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid #fff;
-    font-family: 'PLay', sans-serif;
-    font-size: 16px;
-    font-weight: 200px;
-    padding: 10px 0;
-    transition: border 0.5s;
-    outline: none;
-    color: #fff;
-    font-weight: bold;
-}
-.tip{
-    font-size: 14px;
-    letter-spacing: 0.5px;
-    color: #f00;
-    margin: 0;
-}
-
-
-
-input[type=password] {
-    width: 240px;
-    text-align: center;
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid #fff;
-    font-family: 'PLay', sans-serif;
-    font-size: 16px;
-    font-weight: bold;
-    padding: 10px 0;
-    transition: border 0.5s;
-    outline: none;
-    color: #fff;
-}
-
-input[type=email] {
-    width: 240px;
-    text-align: center;
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid #fff;
-    font-family: 'PLay', sans-serif;
-    font-size: 16px;
-    font-weight: 200px;
-    padding: 10px 0;
-    transition: border 0.5s;
-    outline: none;
-    color: #fff;
-    font-weight: bold;
-}
-
-
-button:hover {
-    background: #ff5b3e;
-}
-button:active{
-    background: #f13412;
-}
-
-button:focus {
-    outline: none;
-}
-button:disabled{
-    background: #cdcdcd;
-    border: #cdcdcd;
-}
-
-/* button.ghost {
-    background: transparent;
-    border-color: #ff4b2b;
-    background-color: #ff4b2b
-} */
-
-.form-container {
-    position: absolute;
-    top: 0;
-    height: 100%;
-    transition: all 0.6s ease-in-out;
-}
-
-.sign-in-container {
-    left: 0;
-    width: 50%;
-    z-index: 2;
-}
-
-.sign-up-container {
-    left: 0;
-    width: 50%;
-    z-index: 1;
-    opacity: 0;
-}
-
-.overlay-container {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: 50%;
-    height: 100%;
-    overflow: hidden;
-    transition: transform 0.6s ease-in-out;
-    z-index: 100;
-}
-
-.overlay {
-    background: transparent;
-    background: linear-gradient(to right, #ff4b2b, #ff416c) no repeat 0 0 /cover;
-    color: #fff;
-    position: absolute;
-    left: -100%;
-    height: 100%;
-    width: 200%;
-    transform: translateX(0);
-    transition: transform 0.6s ease-in-out;
-}
-
-.overlay-panel {
-    position: absolute;
-    top: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 0 40px;
-    height: 100%;
-    width: 50%;
-    text-align: center;
-    transform: translateX(0);
-    transition: transform 0.6s ease-in-out;
-}
-
-.overlay-right {
-    right: 0;
-    transform: translateX(0);
-}
-
-.overlay-left {
-    transform: translateX(-20%);
-}
-
-/*....Animation....*/
-
-/*....Move signin to the right....*/
-.container.right-panel-active .sign-in-container {
-    transform: translateX(100%);
-}
-
-/*....Move overlay to the left....*/
-.container.right-panel-active .overlay-container {
-    transform: translateX(-100%);
-}
-
-/*....Bring sign up over sign in....*/
-.container.right-panel-active .sign-up-container {
-    transform: translateX(100%);
-    opacity: 1;
-    z-index: 5;
-}
-
-/*...Move overlay back to right....*/
-.container.right-panel-active .overlay {
-    transform: translateX(50%);
-}
-
-.container.right-panel-active .overlay-left {
-    transform: translateX(0);
-}
-
-.container.right-panel-active .overlay-right {
-    transform: translateX(20%);
+.foot-lnk{
+	text-align:center;
 }
 </style>

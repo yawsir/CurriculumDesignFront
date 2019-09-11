@@ -30,6 +30,10 @@ export default new Router({
     {
       path: '/login',
       component: () => import('../views/Login.vue')
+    },
+    {
+      path: '/pay',
+      component: () => import('../views/Pay.vue')
     }
   ]
 })

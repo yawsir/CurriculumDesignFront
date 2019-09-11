@@ -18,10 +18,6 @@
                     <i class="el-icon-user"></i>
                     <span slot="title">我的账号</span>
                 </el-menu-item>
-                <el-menu-item index="/home/person/favourite">
-                    <i class="el-icon-star-off"></i>
-                    <span slot="title">我喜欢的菜</span>
-                </el-menu-item>
                 
             </el-menu>
         </div>

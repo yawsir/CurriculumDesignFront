@@ -7,5 +7,8 @@ module.exports = {
             @import "@/config/colorConfig.scss";`
         }
       }
-    }
+    },
+    publicPath: process.env.NODE_ENV === 'production'
+    ? '/onlineOrder/'
+    : '/'
   }

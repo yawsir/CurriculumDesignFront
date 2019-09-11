@@ -18,9 +18,9 @@ Mock.mock(`${api}getfood`, 'get', (req) => {
     
     return Mock.mock({
         success: true,
-        'list|3-10': [
+        'cateList|3-10': [
             {
-                cateId: '@word(3,7)',
+                
                 cateTitle: '@cword(3,5)',
                 'foodList|3-10':[
                     {

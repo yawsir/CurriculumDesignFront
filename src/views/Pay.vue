@@ -1,24 +1,29 @@
 <template>
-    <div id="favourite">
-        喜欢的菜
+    <div id="pay">
+        支付页面
     </div>
 </template>
 
+
 <script>
 export default {
-    name: '',
-    data(){
+    name: "pay",
+
+    data() {
         return {
             
         }
     },
+    methods: {
+
+    },
     mounted(){
-      this.$emit('subMenuOpen', '/home/person/favourite')  
     }
 }
 </script>
 
+
 <style lang="scss" scoped>
 
-</style>
 
+</style>
