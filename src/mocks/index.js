@@ -54,6 +54,13 @@ Mock.mock(`${api}getorder`, 'get', (req) => {
     })
 })
 
+Mock.mock(`${api}queryAccount`, 'get', (req) => {
+    
+    return {
+        canUse: true
+    }
+})
+
 Mock.mock(RegExp(api + ".*"), 'get', (req) => {
     // console.log(req)
     return Mock.mock({
@@ -71,6 +78,8 @@ Mock.mock(RegExp(api + ".*"), 'get', (req) => {
         }
     })
 })
+
+
 
 
 
