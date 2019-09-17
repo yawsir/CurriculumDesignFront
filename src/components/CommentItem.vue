@@ -4,12 +4,12 @@
             <img src="../assets/images/3.jpg" alt class="user-avator" />
         </div>
         <div class="user-comment">
-            <p class="user-name">sfsafsfsfsfsafs</p>
+            <p class="user-name">{{commentInfo.username}}</p>
             <div class="food-rate">
-                <el-rate :value="3" :max="5" disabled text-color="#ff9900"></el-rate>
+                <el-rate :value="commentInfo.rate" :max="5" disabled text-color="#ff9900"></el-rate>
             </div>
-            <p class="food-comment">就老萨老反思吴芳姐撒否定:</p>
-            <p class="comment-date">2019-01-02</p>
+            <p class="food-comment">{{commentInfo.content}}</p>
+            <p class="comment-date">{{commentInfo.date}}</p>
         </div>
     </div>
 </template>
@@ -18,7 +18,9 @@
 <script>
 export default {
     name: "comment-item",
-
+    props: {
+        commentInfo: Object
+    },
     data() {
         return {};
     },
@@ -32,6 +34,8 @@ export default {
     width: 100%;
     display: flex;
     border-bottom: 1px solid $LEVEL_1_BORDER;
+    align-items: center;
+    padding: 3px 0;
     .user-info{
         .user-avator{
             width: 50px;

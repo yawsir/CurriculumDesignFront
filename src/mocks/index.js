@@ -1,6 +1,6 @@
 import Mock from 'mockjs'
 import Interface from '../config/interface.js'
-const api = Interface.mockApi
+const api = Interface.apiAddr
 // let dataList= [
 //     {
 //         cateId: 'hot',
@@ -18,17 +18,17 @@ Mock.mock(`${api}getfood`, 'get', (req) => {
     
     return Mock.mock({
         success: true,
-        'cateList|3-10': [
+        'cate_list|3-10': [
             {
                 
-                cateTitle: '@cword(3,5)',
-                'foodList|3-10':[
+                cate_title: '@cword(3,5)',
+                'food_list|3-10':[
                     {
-                        foodId: '@increment(1)',
-                        foodName: '@cword(3,5)',
-                        rate: '@integer(1,5)',
-                        sales: '@integer(100, 1500)',
-                        price: '@integer(10, 100)',
+                        food_id: '@increment(1)',
+                        food_name: '@cword(3,5)',
+                        food_rate: '@integer(1,5)',
+                        food_sale_count: '@integer(100, 1500)',
+                        food_price: '@integer(10, 100)',
                         img_src: '@dataImage(100x100, mock)'
                     }
                 ]
@@ -59,6 +59,22 @@ Mock.mock(`${api}queryAccount`, 'get', (req) => {
     return {
         canUse: true
     }
+})
+
+Mock.mock(`${api}getFoodComments`, 'get', (req) => {
+    return Mock.mock({
+        message: '成功',
+        code: 200,
+        'comments_list|5-10': [
+            {
+                username: '@cword(3, 5)',
+                rate: '@integer(1,5)',
+                content: '@cword(8,16)',
+                date: '@date(yyyy-MM-dd)'
+            }
+        ]
+        
+    })
 })
 
 Mock.mock(RegExp(api + ".*"), 'get', (req) => {

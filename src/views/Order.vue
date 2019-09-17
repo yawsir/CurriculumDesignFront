@@ -87,7 +87,7 @@
                             :key="index"
                             :class="{cate_item_active: currentCateIndex == index}"
                             @click="handleCateClick(index)"
-                        >{{item.cateTitle}}</li>
+                        >{{item.cate_title}}</li>
                     </ul>
                 </div>
                 <div class="cate_menu_aside" v-show="showAside">
@@ -98,28 +98,28 @@
                             :key="index"
                             :class="{cate_item_active: currentCateIndex == index}"
                             @click="handleCateClick(index)"
-                        >{{item.cateTitle}}</li>
+                        >{{item.cate_title}}</li>
                     </ul>
                 </div>
 
                 <ul class="food_cate_list">
                     <li class="food_cate_item" v-for="(item, index) in dataList" :key="index">
-                        <h3 class="cate_title">{{item.cateTitle}}</h3>
+                        <h3 class="cate_title">{{item.cate_title}}</h3>
                         <ul class="food_list clearfix">
-                            <li class="food_item" v-for="(food, foodIndex) in item.foodList" :key="foodIndex">
+                            <li class="food_item" v-for="(food, foodIndex) in item.food_list" :key="foodIndex">
                                 <img :src="food.img_src" @click="getComments(food)"/>
                                 <div class="food_info">
-                                    <p class="food_name">{{food.foodName}}</p>
+                                    <p class="food_name">{{food.food_name}}</p>
                                     <div class="foot_rate">
                                         <el-rate
-                                            :value="food.rate"
+                                            :value="food.food_rate"
                                             :max="5"
                                             disabled
                                             text-color="#ff9900"
                                         ></el-rate>
                                     </div>
-                                    <p class="food_sale">累计售出{{food.sales}}份</p>
-                                    <p class="food_price">￥{{food.price}}</p>
+                                    <p class="food_sale">累计售出{{food.food_sale_count}}份</p>
+                                    <p class="food_price">￥{{food.food_price}}</p>
                                 </div>
                                 <div class="add_to_cart" @click="addToCart(food)">加入购物车</div>
                             </li>
@@ -144,7 +144,7 @@
                 <div class="cart_content" v-show="cartList.length > 0">
                     <ul class="food_list">
                         <li class="food_item" v-for="(item, index) in cartList" :key="index">
-                            <p class="food_name">{{item.foodName}}</p>
+                            <p class="food_name">{{item.food_name}}</p>
                             <div class="counter">
                                 <el-input-number 
                                 v-model="item.num"
@@ -155,7 +155,7 @@
                                 label="描述文字">
                                 </el-input-number>
                             </div>
-                            <p class="food_price">￥{{item.price}}</p>
+                            <p class="food_price">￥{{item.food_price}}</p>
                         </li>
                         <li class="fixed_fee">
                             <p class="fixed_fee_name">餐盒费</p>
@@ -183,7 +183,7 @@
         <food-comments :clickClose="clickCommentsClose" 
         :addToCart="addToCart"
         v-show="commentsShow" :food="clickFood"
-        
+        :commentsList="commentsList"
         ></food-comments>
     </div>
 </template>
@@ -191,7 +191,7 @@
 <script>
 import Interface from '../config/interface.js'
 import FoodComments from '../components/FoodComments.vue'
-const api = Interface.mockApi
+const apiAddr = Interface.apiAddr
 export default {
     name: "Orders",
     data() {
@@ -206,9 +206,10 @@ export default {
             boxesFee: 1,            //餐盒费
             shippingFee: 3,         //配送费
             sendingFee: 15,          //起送费
-            api,
+            apiAddr,
             commentsShow: false,     //控制评论弹窗
-            clickFood: {}      //点击的食品 传给FoodComments组件 获取评论
+            clickFood: {},      //点击的食品 传给FoodComments组件 获取评论
+            commentsList: []
         };  
     },
     methods: {
@@ -219,32 +220,32 @@ export default {
             switch (command){
                 case 'rateHighToLow': console.log('rateHighToLow')
                 for(let cates of dataList){
-                    cates.foodList.sort((food1, food2) => food2.rate - food1.rate)
+                    cates.food_list.sort((food1, food2) => food2.food_rate - food1.food_rate)
                 }
                 break
                 case 'rateLowToHigh': console.log('rateLowToHigh')
                 for(let cates of dataList){
-                    cates.foodList.sort((food1, food2) => food1.rate - food2.rate)
+                    cates.food_list.sort((food1, food2) => food1.food_rate - food2.food_rate)
                 }
                 break
                 case 'salesHighToLow': console.log('salesHighToLow')
                 for(let cates of dataList){
-                    cates.foodList.sort((food1, food2) => food2.sales - food1.sales)
+                    cates.food_list.sort((food1, food2) => food2.food_sale_count - food1.food_sale_count)
                 }
                 break
                 case 'salesLowToHigh': console.log('salesLowToHigh')
                 for(let cates of dataList){
-                    cates.foodList.sort((food1, food2) => food1.sales - food2.sales)
+                    cates.food_list.sort((food1, food2) => food1.food_sale_count - food2.food_sale_count)
                 }
                 break
                 case 'priceHighToLow': console.log('priceHighToLow')
                 for(let cates of dataList){
-                    cates.foodList.sort((food1, food2) => food2.price - food1.price)
+                    cates.food_list.sort((food1, food2) => food2.food_price - food1.food_price)
                 }
                 break
                 case 'priceLowToHigh': console.log('priceLowToHigh')
                 for(let cates of dataList){
-                    cates.foodList.sort((food1, food2) => food1.price - food2.price)
+                    cates.food_list.sort((food1, food2) => food1.food_price - food2.food_price)
                 }
                 break
                 default: console.log('defaultSort')
@@ -298,18 +299,17 @@ export default {
             //如果没有 新增数组项
             for(let i in this.cartList){
                 //购物车内有要添加的菜品
-                if(this.cartList[i].foodId === food.foodId){
+                if(this.cartList[i].foodId === food.food_id){
                     ++this.cartList[i].num
                     return
                 }
             }
-
             //购物车内没有要添加的菜品
-            let {foodId, foodName, price} = food
+            let {food_id, food_name, food_price} = food
             this.cartList.unshift({
-                foodId,
-                foodName,
-                price,
+                food_id,
+                food_name,
+                food_price,
                 num: 1
             })
 
@@ -335,22 +335,27 @@ export default {
             }
             this.cateItemsOffsetTop = cateItemsOffsetTop
         },
-        getFoodList(){
-            this.$http.get(this.api+ 'getfood')
+        getFoodList(){      //获取菜品信息
+            this.$http.get(this.apiAddr+ 'getfood')
             .then((res) => {
                 console.log(res)
-                this.dataList = res.data.cateList
+                this.dataList = res.data.cate_list
 
             })
         },
         clickCommentsClose(){
             this.commentsShow = !this.commentsShow
         },
-        getComments(food){
-            console.log(food)
+        getComments(food){  //获取评论
+            // console.log(food)
             this.commentsShow = !this.commentsShow
             // this.commentsOption.foodIndex = foodIndex
             this.clickFood = food
+            this.$http.get(`${this.apiAddr}getFoodComments`)    //这后面还要传参food_id
+            .then((res) => {
+                console.log(res)
+                this.commentsList = res.data.comments_list
+            })
         }
     },
     computed: {
@@ -365,7 +370,7 @@ export default {
         foodTotalPrice(){   //购物车内食物总价格
             let totalPrice = 0
             for(let i in this.cartList){
-                totalPrice += this.cartList[i].price * this.cartList[i].num
+                totalPrice += this.cartList[i].food_price * this.cartList[i].num
             }
             return totalPrice
         },
