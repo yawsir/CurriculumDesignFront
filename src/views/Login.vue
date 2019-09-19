@@ -28,7 +28,7 @@
 						<form id="signUpForm" @submit.prevent="signUpFormSubmit">
 						<div class="group">
 							<label for="user" class="label">用户名</label>
-							<input id="user" type="text" class="input" v-model="signUpInfo.account" @input="changeAccount" required />
+							<input id="user" type="text" class="input" v-model="signUpInfo.account" @blur="changeAccount" required />
 							<i class="sign-up-icon" :class="{'el-icon-circle-close': !signUpAccountCanUse,'el-icon-circle-check': signUpAccountCanUse}"></i>
 						</div>
 						<div class="group">
@@ -39,8 +39,8 @@
 							<span class="sex-label">性别</span>
 							<div class="sex-radio">
 								<el-radio-group v-model="signUpInfo.sex">
-									<el-radio :label="1">男</el-radio>
-									<el-radio :label="0">女</el-radio>
+									<el-radio :label="'1'">男</el-radio>
+									<el-radio :label="'0'">女</el-radio>
 								</el-radio-group>
 							</div>
 						</div>
@@ -80,14 +80,16 @@
 
 <script>
 import Interface from '../config/interface.js'
-const api = Interface.mockApi
+import qs from 'qs'
+const apiAddr = Interface.apiAddr
+import {Message} from 'element-ui'
 export default {
     name: "login",
 
     data() {
         return {
             rightPanelActive: false,//注册登录页面的切换
-            api,
+            apiAddr,
             signInInfo: {
                 account: '',          //登录时填写的账号
                 pwd: '',             //登录时填写的密码
@@ -97,7 +99,7 @@ export default {
                 age: '',
                 email: '',
                 tel: '',
-                sex: 1, 	//0男 1女         
+                sex: '1', 	//1男 0女         
                 pwd: '',
                 confirmPwd: '',     
 
@@ -112,20 +114,50 @@ export default {
             // console.log(this.signInInfo)
             this.getVerification((res) => {
                 if(res.ret == 0){
-                    console.log('验证成功')
-                    this.$router.push({path: '/home/order'})
+					console.log('验证成功')
+					let p = {
+						username:this.signInInfo.account,
+						pwd: this.signInInfo.pwd
+					}
+					// this.$router.push({path: '/home/order'})
+					this.$http.post(`${this.apiAddr}users/login`, qs.stringify(p))
+					.then(res => {
+						// console.log(res)
+						if(res.data.code == 200){	//用户名密码匹配
+							//设置cookie
+							this.$router.push({path: '/home/order'})
+						}else{	//用户名或密码错误
+							this.getAlert('用户名密码错误', 'error')
+						}
+					})
                 }
             })
         },
-		signUpFormSubmit(){		//
-		if(this.isPwdSame){
-			this.getVerification((res) => {
-                if(res.ret == 0){
-                    console.log('验证成功')
-                    // this.$router.push({path: '/home/order'})
-                }
-            })
-		}
+		signUpFormSubmit(){		//提交注册表单
+			if(this.isPwdSame){
+				this.getVerification((res) => {
+					if(res.ret == 0){
+						console.log('验证成功')
+						let p = {
+							username: this.signUpInfo.account,
+							pwd: this.signUpInfo.pwd,
+							age: this.signUpInfo.age,
+							sex: this.signUpInfo.sex,
+							email: this.signUpInfo.email,
+							tel: this.signUpInfo.tel
+						}
+						//注册http://10.129.13.185:8080/Online_order_/users/register
+						//${this.apiAddr}modifyAddress
+						this.$http.post(`${this.apiAddr}users/register`, qs.stringify(p))
+						.then(res => {
+							console.log(res)
+						})
+						.catch(err => {
+							console.log(err)
+						})
+					}
+				})
+			}
             
 		},
 		//取消上一次ajax请求
@@ -136,16 +168,16 @@ export default {
     	},
 		changeAccount(){		//注册时输入用户名
 			// console.log(this.signInInfo.account)
-			this.cancelRequest()
-			let _this = this
 			this.signUpAccountCanUse = false
 			if(this.signUpInfo.account !== ''){
-				this.$http.get(`${this.api}queryAccount`,{cancelToken: new this.$http.CancelToken((c)=>{
-					this.cancelAjax = c
-				})})
+				this.$http.post(`${this.apiAddr}users/isExist`,
+					qs.stringify({
+						username:this.signUpInfo.account
+					})
+				)
 				.then((res) => {
-					console.log(typeof res.data.canUse)
-					if(res.data.canUse){
+					// console.log(res)
+					if(res.data.code == 200){
 						this.signUpAccountCanUse = true
 					}
 						
@@ -166,7 +198,13 @@ export default {
         },
         preventSubmit(){    //阻止表单的默认提交行为
             return false
-        }
+		},
+		getAlert(message, type){
+			Message({
+				message,
+				type
+			})
+		}
 
     },
     computed: {

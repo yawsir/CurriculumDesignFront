@@ -1,14 +1,14 @@
 <template>
     <div id="account">
         <div class="inner">
-            <p> 地址：<span class="address" v-show="!isModifyAddress">{{userInfo.address}}</span>
-                <input type="text" v-model="userInfo.address" v-show="isModifyAddress" @blur="switchModify"/>
+            <p> 地址：<span class="address" v-show="!isModifyAddress">{{userInfo.user_address}}</span>
+                <input type="text" v-model="userInfo.user_address" v-show="isModifyAddress" @blur="switchModify"/>
                 <i class="el-icon-edit" @click="switchModify"></i>
             </p>
-            <p>性别：<span class="sex">{{userInfo.sex ? '女': '男'}}</span></p>
-            <p>年龄:<span class="age">{{userInfo.age}}</span></p>
-            <p>电话：<span class="tel">{{userInfo.tel}}</span></p>
-            <p>邮箱：<span>{{userInfo.email}}</span></p>
+            <p>性别：<span class="sex">{{userInfo.user_sex ? '女': '男'}}</span></p>
+            <p>年龄:<span class="age">{{userInfo.user_age}}</span></p>
+            <p>电话：<span class="tel">{{userInfo.user_tel}}</span></p>
+            <p>邮箱：<span>{{userInfo.user_email}}</span></p>
             <p><el-button type="primary" size="mini" @click="isModifyPwd=!isModifyPwd">修改密码</el-button></p>
             <el-form :model="modifyPwdForm" :rules="rules" ref="modifyPwdForm" label-position="left" size="mini" 
                 class="modify-pwd-form" :class="{'modify-pwd-form-active': isModifyPwd}">
@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import Interface from '../config/interface.js'
 export default {
     name: "account",
     data() {
@@ -44,12 +45,9 @@ export default {
  
         return {
             userInfo: {
-                address: "中北大学文瀛13公寓141宿舍",
-                sex: 0,
-                age: 22,
-                tel: 12345678910,
-                email: "2131312@qq.com"
+                
             },
+            apiAddr: Interface.apiAddr,
             isModifyAddress: false,  //是否处于修改地址状态
             isModifyPwd: false,
             modifyPwdForm: {        //表单数据对象
@@ -75,7 +73,13 @@ export default {
         switchModify() {
             this.isModifyAddress = !this.isModifyAddress;
             if (!this.isModifyAddress) {
-                console.log("在这里调用后台修改信息接口")
+                this.$http.post(`${this.apiAddr}modifyAddress`, {
+                    user_id: this.userInfo.user_id,
+                    newAddress: this.userInfo.user_address
+                })
+                .then((res) => {
+                    console.log(res)
+                })
             }
         },
         //确认修改
@@ -88,10 +92,18 @@ export default {
                     return false
                 }
             })
-        }    
+        },
+        getUserInfo(){
+            this.$http.get(`${this.apiAddr}getUserInfo`)    //?user_id=cookie中的user_id
+            .then((res) => {
+                // console.log(res)
+                this.userInfo = res.data
+            })    
+        }  
     },
     mounted() {
         this.$emit("subMenuOpen", "/home/person/account")
+        this.getUserInfo()
     }
 }
 </script>

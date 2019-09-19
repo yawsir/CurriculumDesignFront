@@ -2,11 +2,11 @@
     <div id="order_detail">
         <h4>订单详情</h4>
         <div class="order_status">
-            <p class="status">订单已送达</p>
-            <p class="time">17:29确认送达</p>
+            <p class="status">{{dataList.order_status?'已支付':'未支付'}}</p>
+            <p class="time">下单日期{{dataList.order_date}}</p>
         </div>
         <div class="order_info">
-            <p class="order_number">订单号：123123123123</p>
+            <p class="order_number">订单号：{{dataList.order_number}}</p>
             <div class="info_pay">
                 <h5 class="title">菜品信息</h5>
                 <ul class="pay_header">
@@ -18,7 +18,7 @@
                     <li class="food" v-for="(item, index) in dataList.food_list" :key="index">
                         <p class="food_name">{{item.food_name}}</p>
                         <p class="food_count">{{item.food_count}}</p>
-                        <p class="food_pay">{{item.singal_price*item.food_count}}</p>
+                        <p class="food_pay">{{item.food_price}}</p>
                     </li> 
                     <ul class="other">
                         <li>
@@ -33,7 +33,7 @@
                         </li>
                     </ul>
                 </ul>
-                <p class="total_pay">实际支付：<span class="pay">{{totalPay}}</span></p>
+                <p class="total_pay">实际支付：<span class="pay">{{dataList.order_payment}}</span></p>
             </div>
 
             <div class="info_distribution">
@@ -56,16 +56,16 @@ export default {
     },
     data() {
         return {
-            api: Interface.mockApi,
+            apiAddr: Interface.apiAddr,
             dataList: {}
         }
     },
     methods: {
         getDetail(orderid){
-            this.$http.get(`${this.api}getorderdetail?orderid=${orderid}`)
+            this.$http.get(`${this.apiAddr}getOrderDetail`) //?order_id=${orderid}
             .then((res) => {
                 console.log(res)
-                this.dataList = res.data.info
+                this.dataList = res.data
             })
         }
     },
@@ -73,17 +73,7 @@ export default {
         this.getDetail(this.$route.query.orderid)
     },
     computed: {
-        totalPay(){
-            let t=0
-            let foodList = this.dataList.food_list
-            console.log(foodList)
-            for (let i in foodList){
-                t+= foodList[i].singal_price*foodList[i].food_count
-            }
-            t += this.dataList.boxes_fee
-            t += this.dataList.shipping_fee
-            return t
-        }
+        
         
     },
 }

@@ -11,23 +11,30 @@
 
         <div class="order_content">
             <ul class="content_list">
-                <li class="order_item" v-for="(item, index) in dataList" :key="index">
+                <li class="order_item" v-for="(item, index) in dataList.order_list" :key="index">
                     <ul class="item_info_list">
                         <li class="item_date">{{item.order_date}}</li>
                         <li class="item_content" @click="doOrderDetail(item.order_id)">
                             <img :src="item.img_src" alt />
                             <div class="item_description">
-                                <p class="item_food">{{item.foodName}}</p>
+                                <p class="item_food">{{item.food_name}}</p>
                                 <p class="item_number">{{item.order_number}}</p>
                             </div>
                         </li>
-                        <li class="item_pay">{{item.pay}}</li>
+                        <li class="item_pay">{{item.order_payment}}</li>
                         <li class="item_operate">
                             <el-button type="info" size="mini" plain>查看详情</el-button>
                         </li>
                     </ul>
                 </li>
             </ul>
+            <el-pagination
+                layout="prev, pager, next"
+                :total="dataList.total_count"
+                :page-size="5"
+                :background="true"
+                @current-change="currentChange"
+            ></el-pagination>
         </div>
     </div>
 </template>
@@ -38,20 +45,23 @@ export default {
     name: "order_forms",
     data() {
         return {
-            api: Interface.mockApi,
+            api: Interface.apiAddr,
             dataList: []
         }
     },
     methods: {
-        doOrderDetail(order_id){
+        doOrderDetail(order_id){//点击订单详情
             this.$router.push({path: `/home/person/orderdetail?orderid=${order_id}`})
         },
-        getOrder(){
+        getOrder(){//获取订单列表
             this.$http.get(this.api+'getorder')
             .then((res) => {
                 console.log(res)
-                this.dataList = res.data.list
+                this.dataList = res.data
             })
+        },
+        currentChange(currentPage){    //切换页码
+            console.log(currentPage)
         }
     },
     mounted() {

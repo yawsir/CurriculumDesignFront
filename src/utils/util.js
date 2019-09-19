@@ -48,5 +48,16 @@ export default {
             }, delay)
         }
         
+    },
+    storage: {
+        set(key, value){
+            localStorage.setItem(key, value)
+        },
+        get(key){
+            return JSON.parse(localStorage.getItem(key))
+        },
+        remove(key){
+            localStorage.removeItem(key)
+        }
     }
 }

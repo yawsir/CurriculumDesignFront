@@ -1,5 +1,4 @@
 export default {
-    mockApi: 'http://wwww.mock.com/api/',
-    realApi: '127.0.0.1:8080/',
-    apiAddr: 'http://wwww.mock.com/api/'
+    apiAddr: 'http://wwww.mock.com/api/',
+    // apiAddr: 'http://10.129.13.185:8080/Online_order_/',
 }

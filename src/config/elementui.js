@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import 'element-ui/lib/theme-chalk/index.css';
 import { Button, Menu, MenuItem, Submenu, Avatar, Dropdown, DropdownMenu, DropdownItem, Rate, InputNumber
-        , Collapse, CollapseItem, Tag, Input, Radio, RadioGroup,Form, FormItem} from 'element-ui';
+        , Collapse, CollapseItem, Tag, Input, Radio, RadioGroup,Form, FormItem, Pagination, Select, Option} from 'element-ui';
 Vue.use(Button)
 Vue.use(Menu)
 Vue.use(MenuItem)
@@ -20,3 +20,7 @@ Vue.use(Radio)
 Vue.use(RadioGroup)
 Vue.use(Form)
 Vue.use(FormItem)
+Vue.use(Pagination)
+Vue.use(Select)
+Vue.use(Option)
+// Vue.use(Message)

@@ -70,7 +70,7 @@
             </ul>
 
             <div class="search">
-                <input type="search" placeholder="搜你想吃的" />
+                <input type="search" v-model="searchKey" placeholder="搜你想吃的" @input="searchFood"/>
                 <span>
                     <i class="el-icon-search"></i>
                 </span>
@@ -78,7 +78,7 @@
         </div>
 
         <div class="order_content">
-            <div class="food">
+            <div class="food" v-show="!searchMode">
                 <div class="cate_menu_top">
                     <ul class="cate_list">
                         <li
@@ -129,6 +129,30 @@
                 </ul>
             </div>
 
+            <div class="search_food_list" v-show="searchMode">
+                <ul class="food_list clearfix">
+                    <li class="food_item" v-for="(food, foodIndex) in searchList" :key="foodIndex">
+                        <img :src="food.img_src" @click="getComments(food)"/>
+                        <div class="food_info">
+                            <p class="food_name">{{food.food_name}}</p>
+                            <div class="foot_rate">
+                                <el-rate
+                                    :value="food.food_rate"
+                                    :max="5"
+                                    disabled
+                                    text-color="#ff9900"
+                                ></el-rate>
+                            </div>
+                            <p class="food_sale">累计售出{{food.food_sale_count}}份</p>
+                            <p class="food_price">￥{{food.food_price}}</p>
+                        </div>
+                        <div class="add_to_cart" @click="addToCart(food)">加入购物车</div>
+                    </li>
+                    
+                </ul>
+            </div>
+
+
             <div class="notification">
                 <h3 class="title">商家公告</h3>
                 <p class="noti_content">商家公告内容商家公告内容商家公告内容商家公告内容</p>
@@ -174,7 +198,7 @@
 
                 <div class="cart_footer">
                     <div class="icon"><i class="el-icon-shopping-cart-2"></i></div>
-                    <div class="submit_btn" :class="{unsendable: !sendable}" @click="submitOrder">{{sendable ? '立即下单': `还差${sendingFee - foodTotalPrice - boxesFee}元起送` }}</div>
+                    <div class="submit_btn" :class="{unsendable: !sendable}" @click="submitOrder">{{sendable ? '去结算': `还差${sendingFee - foodTotalPrice - boxesFee}元起送` }}</div>
                 </div>
             </div>
         </div>
@@ -191,7 +215,9 @@
 <script>
 import Interface from '../config/interface.js'
 import FoodComments from '../components/FoodComments.vue'
-const apiAddr = Interface.apiAddr
+import Utils from '../utils/util.js'
+import ShopConfig from '../config/shopConfig.js'
+import Qs from 'qs'
 export default {
     name: "Orders",
     data() {
@@ -199,17 +225,20 @@ export default {
             command: "defaultSort",
             dataList: [],
             currentCateIndex: 0, //当前选中的分类索引
-            showAside: false,
+            showAside: false,          //显示侧边菜单
             cateListToPageTop: 0,    //菜单列表距离文档顶部的距离
             cateItemsOffsetTop: [],     //各个分类距离浏览器顶部的距离 做页内跳转用
             cartList: [],            //购物车数据
-            boxesFee: 1,            //餐盒费
-            shippingFee: 3,         //配送费
-            sendingFee: 15,          //起送费
-            apiAddr,
+            boxesFee: ShopConfig.mealsFee,            //餐盒费
+            shippingFee: ShopConfig.shippingFee,         //配送费
+            sendingFee: ShopConfig.sendingFee,          //起送费
+            apiAddr: Interface.apiAddr,
             commentsShow: false,     //控制评论弹窗
             clickFood: {},      //点击的食品 传给FoodComments组件 获取评论
-            commentsList: []
+            commentsList: [],
+            searchKey: '',   //搜索菜品关键字
+            searchMode: false,   //是否开启搜索模式
+            searchList: []      //搜索菜品的列表
         };  
     },
     methods: {
@@ -293,14 +322,17 @@ export default {
             if(item.num == 0){
                 this.cartList.splice(index, 1)
             }
+            this.setCartInfoToLocal()
         },
-        addToCart(food){
+        addToCart(food){    //把菜品加入购物车
             //遍历cartList 看有没有相同的菜品 如果有在原有基础上num+1
             //如果没有 新增数组项
             for(let i in this.cartList){
                 //购物车内有要添加的菜品
-                if(this.cartList[i].foodId === food.food_id){
+                if(this.cartList[i].food_id === food.food_id){
                     ++this.cartList[i].num
+                    // Utils.storage.set('cart', JSON.stringify(this.cartList))
+                    this.setCartInfoToLocal()
                     return
                 }
             }
@@ -312,18 +344,37 @@ export default {
                 food_price,
                 num: 1
             })
+            // Utils.storage.set('cart', JSON.stringify(this.cartList))
+            this.setCartInfoToLocal()
+
 
         },
         clearCart(){    //清空购物车
             this.cartList = []
         },
-        submitOrder(){  //提交订单
+        submitOrder(){  //去结算
             if(!this.sendable){
                 alert("未达到起送价")
             }else{
                 console.log(this.cartList)
+                // let cartInfo = {
+                //     cartList: this.cartList,
+                //     foodTotalCount: this.foodTotalCount,
+                //     foodTotalPrice: this.foodTotalPrice
+                // }
+                // //将购物车信息放到本地存储
+                // Utils.storage.set('cartInfo', JSON.stringify(cartInfo))
                 this.$router.push({path: '/pay'})
             }
+        },
+        setCartInfoToLocal(){   //把购物车信息添加到本地
+            let cartInfo = {
+                cartList: this.cartList,
+                foodTotalCount: this.foodTotalCount,
+                foodTotalPrice: this.foodTotalPrice
+            }
+            //将购物车信息放到本地存储
+            Utils.storage.set('cartInfo', JSON.stringify(cartInfo))
         },
         listenScroll(){ //绑定滚动条
             let cates = document.querySelectorAll('.food_cate_item')
@@ -336,14 +387,13 @@ export default {
             this.cateItemsOffsetTop = cateItemsOffsetTop
         },
         getFoodList(){      //获取菜品信息
-            this.$http.get(this.apiAddr+ 'getfood')
+            this.$http.get(this.apiAddr+ 'getFoodList')
             .then((res) => {
-                console.log(res)
+                // console.log(res)
                 this.dataList = res.data.cate_list
-
             })
         },
-        clickCommentsClose(){
+        clickCommentsClose(){   //点击弹出的详情框的关闭按钮
             this.commentsShow = !this.commentsShow
         },
         getComments(food){  //获取评论
@@ -356,6 +406,30 @@ export default {
                 console.log(res)
                 this.commentsList = res.data.comments_list
             })
+        },
+        searchFood(){   //搜索菜品
+            if(this.searchKey !== ''){
+                this.$http.post(`${this.apiAddr}searchFood`, Qs.stringify({search_key: this.searchKey}))
+                .then(res => {
+                    // console.log(res)
+                    this.searchList = res.data.food_list
+                    this.searchMode = true
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+            }else{
+                this.searchMode = false
+            }
+        },
+        getCartList(){  //获取本地存储的购物车信息
+            // console.log(Utils.storage.get('cartInfo'))
+            if(Utils.storage.get('cartInfo') !== null){
+                const cartList = Utils.storage.get('cartInfo').cartList
+                console.log(cartList)
+                this.cartList = cartList
+            }
+            
         }
     },
     computed: {
@@ -385,6 +459,7 @@ export default {
     mounted(){
         this.$emit('subMenuOpen', '/home/order')       //使首页导航栏更新
         this.getFoodList()
+        this.getCartList()
     },
     updated(){
         this.listenScroll()
@@ -595,6 +670,79 @@ export default {
                                 background: #1787f8;
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+    .search_food_list{
+        flex: 5;
+        margin-left: 10%;
+        box-sizing: border-box;
+        .food_list {
+            width: 100%;
+            .food_item {
+                float: left;
+                width: 49%;
+                display: flex;
+                position: relative;
+                margin-top: 10px;
+                border: 1px solid #e4e7ed;
+                box-sizing: border-box;
+                &:nth-child(2n){
+                    margin-left: 2%;
+                }
+                img {
+                    flex: 1;
+                    height: 100px;
+                }
+                .food_info {
+                    flex: 3;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-start;
+                    align-items: flex-start;
+                    padding-left: 8px;
+                    padding-top: 20px;
+                    box-sizing: border-box;
+                    flex-wrap: wrap;
+                    .food_name {
+                        flex: 1;
+                        font-size: 16px;
+                        font-weight: bold;
+                        margin: 1px 0;
+                    }
+                    .food_rate{
+                        flex: 1;
+                        margin: 1px 0;
+
+                    }
+                    .food_sale{
+                        flex: 1;
+                        font-size: 12px;
+                        margin: 1px 0;
+
+                    }
+                    .food_price {
+                        flex: 3;
+                        font-size: 16px;
+                        color: #f00;
+                        font-weight: bold;
+                        padding-top: 5px;
+                    }
+                }
+                .add_to_cart {
+                    position: absolute;
+                    bottom: 5px;
+                    right: 10px;
+                    background: #409eff;
+                    border-radius: 50px;
+                    padding: 5px 10px;
+                    font: 14px/1 "微软雅黑";
+                    color: #fff;
+                    cursor: pointer;
+                    &:hover{
+                        background: #1787f8;
                     }
                 }
             }

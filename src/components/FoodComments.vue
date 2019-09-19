@@ -51,7 +51,7 @@ export default {
         CommentItem
     },
     updated(){
-        console.log('更新属性了')
+        // console.log('更新属性了')
         
     },
     mounted(){
