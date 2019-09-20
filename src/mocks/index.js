@@ -13,7 +13,7 @@ const apiAddr = 'http://wwww.mock.com/api/'
 //     },
 // ]
 //首页点餐菜品列表
-Mock.mock(`${apiAddr}getFoodList`, 'get', (req) => {
+Mock.mock(`${apiAddr}goods/selectAll`, 'get', (req) => {
     
     return Mock.mock({
         success: true,

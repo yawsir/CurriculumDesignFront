@@ -5,7 +5,7 @@
                 <input type="text" v-model="userInfo.user_address" v-show="isModifyAddress" @blur="switchModify"/>
                 <i class="el-icon-edit" @click="switchModify"></i>
             </p>
-            <p>性别：<span class="sex">{{userInfo.user_sex ? '女': '男'}}</span></p>
+            <p>性别：<span class="sex">{{userInfo.user_sex ? '男': '女'}}</span></p>
             <p>年龄:<span class="age">{{userInfo.user_age}}</span></p>
             <p>电话：<span class="tel">{{userInfo.user_tel}}</span></p>
             <p>邮箱：<span>{{userInfo.user_email}}</span></p>
@@ -31,6 +31,10 @@
 
 <script>
 import Interface from '../config/interface.js'
+import Utils from '../utils/util.js'
+import Qs from 'qs'
+import {Message} from 'element-ui'
+
 export default {
     name: "account",
     data() {
@@ -70,19 +74,23 @@ export default {
         }
     },
     methods: {
-        switchModify() {
+        switchModify() {    //修改地址
             this.isModifyAddress = !this.isModifyAddress;
             if (!this.isModifyAddress) {
-                this.$http.post(`${this.apiAddr}modifyAddress`, {
-                    user_id: this.userInfo.user_id,
+                const username = Utils.storage.get('username')
+                let p = {
+                    user_name: username,
                     newAddress: this.userInfo.user_address
-                })
+                }
+                this.$http.post(`${this.apiAddr}/users/updateAddress`, Qs.stringify(p))
                 .then((res) => {
-                    console.log(res)
+                    if(res.data.code == 200){
+                        this.getAlert('修改地址成功','success')
+                    }
                 })
             }
         },
-        //确认修改
+        //确认修改密码
         submitModify(formRef){
             this.$refs[formRef].validate((valid) => {
                 if (valid) {
@@ -93,13 +101,23 @@ export default {
                 }
             })
         },
-        getUserInfo(){
-            this.$http.get(`${this.apiAddr}getUserInfo`)    //?user_id=cookie中的user_id
+        getUserInfo(){  //获取用户信息
+            const localUserInfo = Utils.storage.get('userInfo')
+            let p = {
+                user_name: localUserInfo.username
+            }
+            this.$http.post(`${this.apiAddr}users/getUserInfo`,Qs.stringify(p))    //?user_id=cookie中的user_id
             .then((res) => {
-                // console.log(res)
-                this.userInfo = res.data
+                console.log(res)
+                this.userInfo = res.data[0]
             })    
-        }  
+        },
+        getAlert(message, type){    //弹窗
+			Message({
+				message,
+				type
+			})
+		}  
     },
     mounted() {
         this.$emit("subMenuOpen", "/home/person/account")

@@ -31,12 +31,11 @@
                 <div class="dropdown">
                     <el-dropdown :hide-on-click="true" trigger="hover" @command="onClickDropdownItem">
                         <span class="el-dropdown-link">
-                            用户名
+                            {{userInfo.username}}
                             <i class="el-icon-arrow-down el-icon--right"></i>
                         </span>
                         <el-dropdown-menu slot="dropdown">
                             <el-dropdown-item icon="el-icon-user" command="orderforms">我的订单</el-dropdown-item>
-                            <el-dropdown-item icon="el-icon-star-off" command="favourite">我喜欢的菜</el-dropdown-item>
                             <el-dropdown-item icon="el-icon-location-outline" command="account">我的地址</el-dropdown-item>
                             <el-dropdown-item :divided="true" icon="el-icon-switch-button">退出登录</el-dropdown-item>
                         </el-dropdown-menu>
@@ -51,12 +50,15 @@
 
 <script>
 import colorConfig from "../config/colorConfig";
+import Utils from '../utils/util.js'
 export default {
     name: "Home",
     data() {
         return {
             colorConfig: colorConfig,
-            subMenuIndex: '/home/order'
+            subMenuIndex: '/home/order',
+            userInfo: {
+            }
         };
     },
     methods: {
@@ -70,7 +72,13 @@ export default {
         },
         onSubMenuOpen(subMenuIndex){
             this.subMenuIndex = subMenuIndex
+        },
+        getUsername(){  //获取local storage中的用户名
+            this.userInfo = Utils.storage.get('userInfo')
         }
+    },
+    mounted(){
+        this.getUsername()
     }
 };
 </script>

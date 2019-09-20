@@ -83,6 +83,7 @@ import Interface from '../config/interface.js'
 import qs from 'qs'
 const apiAddr = Interface.apiAddr
 import {Message} from 'element-ui'
+import Utils from '../utils/util.js'
 export default {
     name: "login",
 
@@ -122,9 +123,14 @@ export default {
 					// this.$router.push({path: '/home/order'})
 					this.$http.post(`${this.apiAddr}users/login`, qs.stringify(p))
 					.then(res => {
-						// console.log(res)
+						console.log(res)
 						if(res.data.code == 200){	//用户名密码匹配
-							//设置cookie
+							//将user_id和username保存在local storage中
+							const userInfo = {
+								userId: res.data.user_id,
+								username: res.data.user_name
+							}
+							Utils.storage.set('userInfo', JSON.stringify(userInfo))
 							this.$router.push({path: '/home/order'})
 						}else{	//用户名或密码错误
 							this.getAlert('用户名密码错误', 'error')
@@ -150,7 +156,8 @@ export default {
 						//${this.apiAddr}modifyAddress
 						this.$http.post(`${this.apiAddr}users/register`, qs.stringify(p))
 						.then(res => {
-							console.log(res)
+							// console.log(res)
+							this.getAlert('注册成功', 'success')
 						})
 						.catch(err => {
 							console.log(err)

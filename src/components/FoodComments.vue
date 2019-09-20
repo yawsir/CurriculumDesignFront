@@ -3,9 +3,9 @@
         <div class="inner">
             <img class="big-pic" :src="food.img_src" alt="">
             <div class="food-detail">
-                <h5 class="food-name">{{food.food_name}}</h5>
+                <h5 class="food-name">{{food.goods_name}}</h5>
                 <div class="flex-wrap">
-                    <p class="price">￥{{food.food_price}}</p>
+                    <p class="price">￥{{food.goods_price}}</p>
                     <el-button type="primary" @click="addToCart(food)">加入购物车</el-button>
                 </div>
                 

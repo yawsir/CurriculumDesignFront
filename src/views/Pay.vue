@@ -34,7 +34,7 @@
         </div>
         <div class="operate">
             <p class="user_address">收获地址:<span>{{userAddress}}</span></p>
-            <el-button type="primary" @click="submitOrder">提交订单</el-button>
+            <el-button type="primary" @click="submitOrder" :disabled="!isPaid">提交订单</el-button>
         </div>
         <div class="pay_way">
             <el-select v-model="payWay" placeholder="选择支付方式">
@@ -50,7 +50,7 @@
                 <img src="../assets/images/alipay.png" alt="">
             </div>
             <div class="operate">
-                <el-button type="primary">模拟支付完成</el-button>
+                <el-button type="primary" @click="isPaid = true">模拟支付完成</el-button>
             </div>
         </div>
     </div>
@@ -68,7 +68,7 @@ export default {
     data() {
         return {
             cartInfo: {},
-            payWay: '',
+            payWay: 'weChat',
             payWays:[
                 {
                     value: 'weChat',
@@ -80,7 +80,8 @@ export default {
                 }
             ],
             apiAddr: Interface.apiAddr,
-            userAddress: ''
+            userAddress: '',
+            isPaid: false
         }
     },
     methods: {
@@ -89,10 +90,10 @@ export default {
             console.log(this.cartInfo)
         },
         getUserAddress(){   //获取用户地址
-            this.$http.get(`${this.apiAddr}getUserInfo`)    //?user_id=cookie中的user_id
+            this.$http.get(`${this.apiAddr}users/getUserInfo`)    //?user_id=cookie中的user_id
             .then((res) => {
                 console.log(res)
-                this.userAddress = res.data.user_address
+                this.userAddress = res.data[0].user_address
             })    
         },
         submitOrder(){  //点击提交订单
@@ -101,17 +102,19 @@ export default {
                 foodListStr += item.food_id + ':' + item.num + ','
             }
             // console.log(foodListStr)
+            let localUserInfo = Utils.storage.get('userInfo')
             let p = {
-                user_id: '12313',       //cookie中的user_id
+                user_id: localUserInfo.userId,       //cookie中的user_id
                 order_money: this.realPrice,
-                address: this.user_address,
+                address: this.userAddress,
                 pay_method: this.payWay == 'ali' ? '支付宝' : '微信',
                 food_list: foodListStr
             }
-            this.$http.post(`${this.apiAddr}commitOrder`,Qs.stringify(p))
-            .then((res) => {
-                console.log(res)
-            })
+            console.log(p)
+            // this.$http.post(`${this.apiAddr}/order/commitOrder`,Qs.stringify(p))
+            // .then((res) => {
+            //     console.log(res)
+            // })
         }
     },
     mounted(){

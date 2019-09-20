@@ -4,12 +4,12 @@
             <img src="../assets/images/3.jpg" alt class="user-avator" />
         </div>
         <div class="user-comment">
-            <p class="user-name">{{commentInfo.username}}</p>
+            <p class="user-name">{{commentInfo.comment_user}}</p>
             <div class="food-rate">
-                <el-rate :value="commentInfo.rate" :max="5" disabled text-color="#ff9900"></el-rate>
+                <el-rate :value="commentInfo.comment_rate" :max="5" disabled text-color="#ff9900"></el-rate>
             </div>
-            <p class="food-comment">{{commentInfo.content}}</p>
-            <p class="comment-date">{{commentInfo.date}}</p>
+            <p class="food-comment">{{commentInfo.comment_text}}</p>
+            <p class="comment-date">{{commentInfo.comment_date}}</p>
         </div>
     </div>
 </template>

@@ -4,7 +4,7 @@ import router from './routers/router'
 import store from './stores/store'
 import './config/elementui.js'
 import axios from 'axios'
-import './mocks/'
+// import './mocks/'
 Vue.config.productionTip = false
 Vue.prototype.$http = axios
 

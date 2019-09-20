@@ -87,7 +87,7 @@
                             :key="index"
                             :class="{cate_item_active: currentCateIndex == index}"
                             @click="handleCateClick(index)"
-                        >{{item.cate_title}}</li>
+                        >{{item.catelog_name}}</li>
                     </ul>
                 </div>
                 <div class="cate_menu_aside" v-show="showAside">
@@ -98,28 +98,28 @@
                             :key="index"
                             :class="{cate_item_active: currentCateIndex == index}"
                             @click="handleCateClick(index)"
-                        >{{item.cate_title}}</li>
+                        >{{item.catelog_name}}</li>
                     </ul>
                 </div>
 
                 <ul class="food_cate_list">
                     <li class="food_cate_item" v-for="(item, index) in dataList" :key="index">
-                        <h3 class="cate_title">{{item.cate_title}}</h3>
+                        <h3 class="cate_title">{{item.catelog_name}}</h3>
                         <ul class="food_list clearfix">
-                            <li class="food_item" v-for="(food, foodIndex) in item.food_list" :key="foodIndex">
+                            <li class="food_item" v-for="(food, foodIndex) in item.foods" :key="foodIndex">
                                 <img :src="food.img_src" @click="getComments(food)"/>
                                 <div class="food_info">
-                                    <p class="food_name">{{food.food_name}}</p>
+                                    <p class="food_name">{{food.goods_name}}</p>
                                     <div class="foot_rate">
                                         <el-rate
-                                            :value="food.food_rate"
+                                            :value="food.goods_rate"
                                             :max="5"
                                             disabled
                                             text-color="#ff9900"
                                         ></el-rate>
                                     </div>
-                                    <p class="food_sale">累计售出{{food.food_sale_count}}份</p>
-                                    <p class="food_price">￥{{food.food_price}}</p>
+                                    <p class="food_sale">累计售出{{food.goods_amount}}份</p>
+                                    <p class="food_price">￥{{food.goods_price}}</p>
                                 </div>
                                 <div class="add_to_cart" @click="addToCart(food)">加入购物车</div>
                             </li>
@@ -132,19 +132,19 @@
             <div class="search_food_list" v-show="searchMode">
                 <ul class="food_list clearfix">
                     <li class="food_item" v-for="(food, foodIndex) in searchList" :key="foodIndex">
-                        <img :src="food.img_src" @click="getComments(food)"/>
+                        <img :src="food.goods_picture" @click="getComments(food)"/>
                         <div class="food_info">
-                            <p class="food_name">{{food.food_name}}</p>
+                            <p class="food_name">{{food.goods_name}}</p>
                             <div class="foot_rate">
                                 <el-rate
-                                    :value="food.food_rate"
+                                    :value="food.goods_rate"
                                     :max="5"
                                     disabled
                                     text-color="#ff9900"
                                 ></el-rate>
                             </div>
-                            <p class="food_sale">累计售出{{food.food_sale_count}}份</p>
-                            <p class="food_price">￥{{food.food_price}}</p>
+                            <p class="food_sale">累计售出{{food.goods_amount}}份</p>
+                            <p class="food_price">￥{{food.goods_price}}</p>
                         </div>
                         <div class="add_to_cart" @click="addToCart(food)">加入购物车</div>
                     </li>
@@ -329,7 +329,7 @@ export default {
             //如果没有 新增数组项
             for(let i in this.cartList){
                 //购物车内有要添加的菜品
-                if(this.cartList[i].food_id === food.food_id){
+                if(this.cartList[i].goods_id === food.goods_id){
                     ++this.cartList[i].num
                     // Utils.storage.set('cart', JSON.stringify(this.cartList))
                     this.setCartInfoToLocal()
@@ -337,11 +337,11 @@ export default {
                 }
             }
             //购物车内没有要添加的菜品
-            let {food_id, food_name, food_price} = food
+            let {goods_id, goods_name, goods_price} = food
             this.cartList.unshift({
-                food_id,
-                food_name,
-                food_price,
+                food_id:goods_id,
+                food_name:goods_name,
+                food_price:goods_price,
                 num: 1
             })
             // Utils.storage.set('cart', JSON.stringify(this.cartList))
@@ -351,6 +351,7 @@ export default {
         },
         clearCart(){    //清空购物车
             this.cartList = []
+            Utils.storage.remove('cartInfo')
         },
         submitOrder(){  //去结算
             if(!this.sendable){
@@ -387,10 +388,10 @@ export default {
             this.cateItemsOffsetTop = cateItemsOffsetTop
         },
         getFoodList(){      //获取菜品信息
-            this.$http.get(this.apiAddr+ 'getFoodList')
+            this.$http.get(this.apiAddr+ 'goods/selectAll')
             .then((res) => {
-                // console.log(res)
-                this.dataList = res.data.cate_list
+                console.log(res)
+                this.dataList = res.data
             })
         },
         clickCommentsClose(){   //点击弹出的详情框的关闭按钮
@@ -401,18 +402,18 @@ export default {
             this.commentsShow = !this.commentsShow
             // this.commentsOption.foodIndex = foodIndex
             this.clickFood = food
-            this.$http.get(`${this.apiAddr}getFoodComments`)    //这后面还要传参food_id
+            this.$http.get(`${this.apiAddr}goods/selectComment?food_id=${this.clickFood.goods_id}`)    //这后面还要传参food_id
             .then((res) => {
                 console.log(res)
-                this.commentsList = res.data.comments_list
+                this.commentsList = res.data
             })
         },
         searchFood(){   //搜索菜品
             if(this.searchKey !== ''){
-                this.$http.post(`${this.apiAddr}searchFood`, Qs.stringify({search_key: this.searchKey}))
+                this.$http.post(`${this.apiAddr}goods/selectSome`, Qs.stringify({search_key: this.searchKey}))
                 .then(res => {
-                    // console.log(res)
-                    this.searchList = res.data.food_list
+                    console.log(res)
+                    this.searchList = res.data
                     this.searchMode = true
                 })
                 .catch(err => {
