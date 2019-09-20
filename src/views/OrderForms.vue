@@ -9,16 +9,16 @@
             </ul>
         </div>
 
-        <div class="order_content">
+        <div class="order_content" v-loading="isLoading">
             <ul class="content_list">
-                <li class="order_item" v-for="(item, index) in dataList.order_list" :key="index">
+                <li class="order_item" v-for="(item, index) in dataList" :key="index">
                     <ul class="item_info_list">
                         <li class="item_date">{{item.order_date}}</li>
                         <li class="item_content" @click="doOrderDetail(item.order_id)">
-                            <img :src="item.img_src" alt />
+                            <img :src="item.goods_img[0].food_picture" alt />
                             <div class="item_description">
-                                <p class="item_food">{{item.food_name}}</p>
-                                <p class="item_number">{{item.order_number}}</p>
+                                <p class="item_food"><span v-for="(foodName, foodNameIndex) in item.goods_img" :key="foodNameIndex">{{foodName.food_name}}、</span></p>
+                                <p class="item_number">{{item.order_id}}</p>
                             </div>
                         </li>
                         <li class="item_pay">{{item.order_payment}}</li>
@@ -30,7 +30,7 @@
             </ul>
             <el-pagination
                 layout="prev, pager, next"
-                :total="dataList.total_count"
+                :total="total_count"
                 :page-size="5"
                 :background="true"
                 @current-change="currentChange"
@@ -42,33 +42,48 @@
 <script>
 import Interface from '../config/interface.js'
 import Utils from '../utils/util.js'
+import Qs from 'qs'
 export default {
     name: "order_forms",
     data() {
         return {
-            api: Interface.apiAddr,
-            dataList: []
+            apiAddr: Interface.apiAddr,
+            total_count: 0,
+            dataList: [],
+            isLoading: true
         }
     },
     methods: {
         doOrderDetail(order_id){//点击订单详情
             this.$router.push({path: `/home/person/orderdetail?orderid=${order_id}`})
         },
-        getOrder(){//获取订单列表
-            this.$http.get(this.api+'getorder')
+        getOrder(page){//获取订单列表
+            this.isLoading = true
+            const userInfo = Utils.storage.get('userInfo')
+            this.$http.get(`${this.apiAddr}order/getOrderList?order_user_id=${userInfo.userId}&current_page=${page}`)
             .then((res) => {
-                console.log(res)
-                this.dataList = res.data
+                // console.log(res)
+                this.isLoading = false
+                this.dataList = res.data.order_list
             })
         },
         currentChange(currentPage){    //切换页码
-            console.log(currentPage)
+            // console.log(currentPage)
+            this.getOrder(currentPage)
+        },
+        getOrderFormCount(){    //获取订单总数
+            const userInfo = Utils.storage.get('userInfo')
+            this.$http.get(`${this.apiAddr}order/selectAll?order_user_id=${userInfo.userId}`)
+            .then(res => {
+                console.log(typeof res.data)
+                this.total_count = res.data
+            })
         }
     },
     mounted() {
         this.$emit('subMenuOpen', '/home/person/orderforms')  
-        this.getOrder()
-          
+        this.getOrder(1)
+        this.getOrderFormCount()  
     },
 };
 </script>
@@ -107,6 +122,7 @@ export default {
     .order_content {
         font-size: 12px;
         color: $SECONDARY_TEXT;
+        min-height: 500px;
         .content_list{
             .order_item{
                 background: $BASIC_WHITE;

@@ -2,11 +2,11 @@
     <div id="order_detail">
         <h4>订单详情</h4>
         <div class="order_status">
-            <p class="status">{{dataList.order_status?'已支付':'未支付'}}</p>
-            <p class="time">下单日期{{dataList.order_date}}</p>
+            <p class="status">{{dataList.order.order_status?'已支付':'未支付'}}</p>
+            <p class="time">下单日期{{dataList.order.order_date}}</p>
         </div>
         <div class="order_info">
-            <p class="order_number">订单号：{{dataList.order_number}}</p>
+            <p class="order_number">订单号：{{dataList.order.order_id}}</p>
             <div class="info_pay">
                 <h5 class="title">菜品信息</h5>
                 <ul class="pay_header">
@@ -15,31 +15,31 @@
                     <li>金额</li>
                 </ul>
                 <ul class="pay_content">
-                    <li class="food" v-for="(item, index) in dataList.food_list" :key="index">
-                        <p class="food_name">{{item.food_name}}</p>
-                        <p class="food_count">{{item.food_count}}</p>
-                        <p class="food_pay">{{item.food_price}}</p>
+                    <li class="food" v-for="(item, index) in dataList.goodsInfo" :key="index">
+                        <p class="food_name">{{item.goods_name}}</p>
+                        <p class="food_count">{{item.goods_amount}}</p>
+                        <p class="food_pay">{{item.goods_price}}</p>
                     </li> 
                     <ul class="other">
                         <li>
                             <p class="other_name">餐盒费</p>
                             <p class="place"></p>
-                            <p class="other_fee">{{dataList.boxes_fee}}</p>
+                            <p class="other_fee">{{shopConfig.mealsFee}}</p>
                         </li>
                         <li>
                             <p class="other_name">配送费</p>
                             <p class="place"></p>
-                            <p class="other_fee">{{dataList.shipping_fee}}</p>
+                            <p class="other_fee">{{shopConfig.shippingFee}}</p>
                         </li>
                     </ul>
                 </ul>
-                <p class="total_pay">实际支付：<span class="pay">{{dataList.order_payment}}</span></p>
+                <p class="total_pay">实际支付：<span class="pay">{{dataList.order.order_money}}</span></p>
             </div>
 
             <div class="info_distribution">
                 <h5 class="title">菜品评价</h5>
                 
-                <evaluate/>
+                <evaluate :commentsList="commentsList" :orderid="$route.query.orderid"/>
             </div>
         </div>
     </div>
@@ -49,28 +49,55 @@
 <script>
 import Interface from '../config/interface.js'
 import Evaluate from '../components/Evaulate.vue'
+import ShopConfig from '../config/shopConfig.js'
+import Utils from '../utils/util.js'
+import Qs from 'qs'
 export default {
     name: "order_detail",
     components: {
-        Evaluate
+        Evaluate,
     },
     data() {
         return {
             apiAddr: Interface.apiAddr,
-            dataList: {}
+            dataList: { //本页菜品数据
+                order: {
+                    order_status: 0
+                }
+            },
+            shopConfig: ShopConfig,
+            isLoading: false,
+            commentsList: []    //用户对本订单的评价数据
         }
     },
     methods: {
-        getDetail(orderid){
-            this.$http.get(`${this.apiAddr}getOrderDetail`) //?order_id=${orderid}
+        getDetail(orderid){ //获取订单详情
+            this.$http.get(`${this.apiAddr}order/orderDetail?order_id=${orderid}`) //
             .then((res) => {
-                console.log(res)
+                // console.log(res)
                 this.dataList = res.data
+                // console.log(this.dataList.order.order_status)
+            })
+        },
+        getOwnComments(){   //获取个人对本单各个菜品的评价
+            let localUserInfo = Utils.storage.get('userInfo') 
+            let p = {
+                user_id: localUserInfo.userId,
+                order_id: this.$route.query.orderid
+            }   
+            // console.log(p)
+            this.$http.post(`${this.apiAddr}comment/getOwnComment`, Qs.stringify(p))
+            .then(res => {
+                // console.log(111)
+                console.log(res)
+                this.commentsList = res.data.food_list
             })
         }
     },
     mounted(){
         this.getDetail(this.$route.query.orderid)
+        // console.log(this.$route.query.orderid)
+        this.getOwnComments()
     },
     computed: {
         

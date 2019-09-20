@@ -77,8 +77,8 @@
             </div>
         </div>
 
-        <div class="order_content">
-            <div class="food" v-show="!searchMode">
+        <div class="order_content"  >
+            <div class="food" v-show="!searchMode" v-loading="isLoading">
                 <div class="cate_menu_top">
                     <ul class="cate_list">
                         <li
@@ -102,7 +102,7 @@
                     </ul>
                 </div>
 
-                <ul class="food_cate_list">
+                <ul class="food_cate_list"  >
                     <li class="food_cate_item" v-for="(item, index) in dataList" :key="index">
                         <h3 class="cate_title">{{item.catelog_name}}</h3>
                         <ul class="food_list clearfix">
@@ -238,7 +238,8 @@ export default {
             commentsList: [],
             searchKey: '',   //搜索菜品关键字
             searchMode: false,   //是否开启搜索模式
-            searchList: []      //搜索菜品的列表
+            searchList: [],      //搜索菜品的列表
+            isLoading: true
         };  
     },
     methods: {
@@ -329,7 +330,7 @@ export default {
             //如果没有 新增数组项
             for(let i in this.cartList){
                 //购物车内有要添加的菜品
-                if(this.cartList[i].goods_id === food.goods_id){
+                if(this.cartList[i].food_id === food.goods_id){
                     ++this.cartList[i].num
                     // Utils.storage.set('cart', JSON.stringify(this.cartList))
                     this.setCartInfoToLocal()
@@ -390,8 +391,9 @@ export default {
         getFoodList(){      //获取菜品信息
             this.$http.get(this.apiAddr+ 'goods/selectAll')
             .then((res) => {
-                console.log(res)
+                // console.log(res)
                 this.dataList = res.data
+                this.isLoading = false
             })
         },
         clickCommentsClose(){   //点击弹出的详情框的关闭按钮
@@ -409,12 +411,14 @@ export default {
             })
         },
         searchFood(){   //搜索菜品
+            this.isLoading = true
             if(this.searchKey !== ''){
                 this.$http.post(`${this.apiAddr}goods/selectSome`, Qs.stringify({search_key: this.searchKey}))
                 .then(res => {
-                    console.log(res)
+                    // console.log(res)
                     this.searchList = res.data
                     this.searchMode = true
+                    this.isLoading = false
                 })
                 .catch(err => {
                     console.log(err)

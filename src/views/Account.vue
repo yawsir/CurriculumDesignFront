@@ -77,12 +77,13 @@ export default {
         switchModify() {    //修改地址
             this.isModifyAddress = !this.isModifyAddress;
             if (!this.isModifyAddress) {
-                const username = Utils.storage.get('username')
+                const localUserInfo = Utils.storage.get('userInfo')
                 let p = {
-                    user_name: username,
+                    user_name: localUserInfo.username,
                     newAddress: this.userInfo.user_address
                 }
-                this.$http.post(`${this.apiAddr}/users/updateAddress`, Qs.stringify(p))
+                console.log(p)
+                this.$http.post(`${this.apiAddr}users/updateAddress`, Qs.stringify(p))
                 .then((res) => {
                     if(res.data.code == 200){
                         this.getAlert('修改地址成功','success')

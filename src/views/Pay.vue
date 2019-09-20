@@ -90,7 +90,11 @@ export default {
             console.log(this.cartInfo)
         },
         getUserAddress(){   //获取用户地址
-            this.$http.get(`${this.apiAddr}users/getUserInfo`)    //?user_id=cookie中的user_id
+            const localUserInfo = Utils.storage.get('userInfo')
+            let p = {
+                user_name: localUserInfo.username
+            }
+            this.$http.post(`${this.apiAddr}users/getUserInfo`,Qs.stringify(p))    //?user_id=cookie中的user_id
             .then((res) => {
                 console.log(res)
                 this.userAddress = res.data[0].user_address
@@ -111,10 +115,10 @@ export default {
                 food_list: foodListStr
             }
             console.log(p)
-            // this.$http.post(`${this.apiAddr}/order/commitOrder`,Qs.stringify(p))
-            // .then((res) => {
-            //     console.log(res)
-            // })
+            this.$http.post(`${this.apiAddr}order/commitOrder`,Qs.stringify(p))
+            .then((res) => {
+                console.log(res)
+            })
         }
     },
     mounted(){
