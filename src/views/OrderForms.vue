@@ -75,7 +75,7 @@ export default {
             const userInfo = Utils.storage.get('userInfo')
             this.$http.get(`${this.apiAddr}order/selectAll?order_user_id=${userInfo.userId}`)
             .then(res => {
-                console.log(typeof res.data)
+                // console.log(typeof res.data)
                 this.total_count = res.data
             })
         }

@@ -34,9 +34,9 @@
         </div>
         <div class="operate">
             <p class="user_address">收获地址:<span>{{userAddress}}</span></p>
-            <el-button type="primary" @click="submitOrder" :disabled="!isPaid">提交订单</el-button>
+            <el-button type="primary" @click="submitOrder">提交订单</el-button>
         </div>
-        <div class="pay_way">
+        <div class="pay_way" v-show="isSubmit">
             <el-select v-model="payWay" placeholder="选择支付方式">
                 <el-option
                 v-for="(item, index) in payWays"
@@ -50,7 +50,7 @@
                 <img src="../assets/images/alipay.png" alt="">
             </div>
             <div class="operate">
-                <el-button type="primary" @click="isPaid = true">模拟支付完成</el-button>
+                <el-button type="primary" @click="paidSuccess">模拟支付完成</el-button>
             </div>
         </div>
     </div>
@@ -62,6 +62,7 @@ import Utils from '../utils/util.js'
 import ShopConfig from '../config/shopConfig.js'
 import Interface from '../config/interface.js'
 import Qs from 'qs'
+import {Message} from 'element-ui'
 export default {
     name: "pay",
 
@@ -81,7 +82,7 @@ export default {
             ],
             apiAddr: Interface.apiAddr,
             userAddress: '',
-            isPaid: false
+            isSubmit: false
         }
     },
     methods: {
@@ -117,9 +118,23 @@ export default {
             console.log(p)
             this.$http.post(`${this.apiAddr}order/commitOrder`,Qs.stringify(p))
             .then((res) => {
-                console.log(res)
+                if(res.data.code == 200){   //订单提交成功 展示支付界面
+                    this.isSubmit = true
+                    this.getAlert('订单已提交','success')
+                    Utils.storage.remove('cartInfo')
+                }
             })
-        }
+        },
+        paidSuccess(){  //支付成功
+            this.getAlert('支付成功','success')
+            this.$router.push({path: '/home/order'})
+        },
+        getAlert(message, type){
+			Message({
+				message,
+				type
+			})
+		}
     },
     mounted(){
         this.getCart()

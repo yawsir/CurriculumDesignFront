@@ -39,7 +39,7 @@
             <div class="info_distribution">
                 <h5 class="title">菜品评价</h5>
                 
-                <evaluate :commentsList="commentsList" :orderid="$route.query.orderid"/>
+                <evaluate :commentsList="commentsList" :orderid="$route.query.orderid" :foodInfos="foodInfos"/>
             </div>
         </div>
     </div>
@@ -67,7 +67,8 @@ export default {
             },
             shopConfig: ShopConfig,
             isLoading: false,
-            commentsList: []    //用户对本订单的评价数据
+            commentsList: [],    //用户对本订单的评价数据
+            foodInfos: []   //本单所有菜品的名字
         }
     },
     methods: {
@@ -75,6 +76,17 @@ export default {
             this.$http.get(`${this.apiAddr}order/orderDetail?order_id=${orderid}`) //
             .then((res) => {
                 // console.log(res)
+                let foodInfos = []  //本单所有菜品的名字
+                for(let goods of res.data.goodsInfo){
+                    foodInfos.push(
+                        {
+                            foodName:goods.goods_name,
+                            foodImg: goods.goods_picture
+                        }
+                    )
+                }
+                console.log(foodInfos)
+                this.foodInfos = foodInfos
                 this.dataList = res.data
                 // console.log(this.dataList.order.order_status)
             })
@@ -89,7 +101,7 @@ export default {
             this.$http.post(`${this.apiAddr}comment/getOwnComment`, Qs.stringify(p))
             .then(res => {
                 // console.log(111)
-                console.log(res)
+                // console.log(res)
                 this.commentsList = res.data.food_list
             })
         }

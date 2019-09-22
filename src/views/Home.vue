@@ -37,7 +37,7 @@
                         <el-dropdown-menu slot="dropdown">
                             <el-dropdown-item icon="el-icon-user" command="orderforms">我的订单</el-dropdown-item>
                             <el-dropdown-item icon="el-icon-location-outline" command="account">我的地址</el-dropdown-item>
-                            <el-dropdown-item :divided="true" icon="el-icon-switch-button">退出登录</el-dropdown-item>
+                            <el-dropdown-item :divided="true" icon="el-icon-switch-button" command="quickAccount">退出登录</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
                 </div>
@@ -51,6 +51,7 @@
 <script>
 import colorConfig from "../config/colorConfig";
 import Utils from '../utils/util.js'
+import {Message} from 'element-ui'
 export default {
     name: "Home",
     data() {
@@ -66,7 +67,10 @@ export default {
             // console.log(key, keyPath);
         },
         onClickDropdownItem(command){  //点击右上角下拉列表项
-            if(command){
+            if(command === 'quickAccount'){
+                this.quitAccount()
+                return 
+            }else if(command){
                 this.$router.push({path: `/home/person/${command}`})
             }
         },
@@ -75,10 +79,34 @@ export default {
         },
         getUsername(){  //获取local storage中的用户名
             this.userInfo = Utils.storage.get('userInfo')
-        }
+        },
+        quitAccount(){  //退出登录
+            //清除local storage中的cartInfo 和 userInfo
+            Utils.storage.remove('userInfo')
+            Utils.storage.remove('cartInfo')
+            this.$router.replace({path: '/login'})
+        },
+        checkLoginInfo(){  //检查登录信息是否存在
+            if(!Utils.storage.get('userInfo')){
+                console.log('登录异常')
+                this.getAlert('登录信息异常，请重新登录', 'error')
+                this.$router.replace({path: '/login'})
+            }
+        },
+        getAlert(message, type){
+			Message({
+				message,
+				type
+			})
+        },
     },
     mounted(){
+        this.checkLoginInfo()
         this.getUsername()
+    },
+    updated(){
+        // console.log('home组件更新了 要不要检查登录信息')
+        this.checkLoginInfo()
     }
 };
 </script>

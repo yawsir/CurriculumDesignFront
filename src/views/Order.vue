@@ -250,32 +250,32 @@ export default {
             switch (command){
                 case 'rateHighToLow': console.log('rateHighToLow')
                 for(let cates of dataList){
-                    cates.food_list.sort((food1, food2) => food2.food_rate - food1.food_rate)
+                    cates.foods.sort((food1, food2) => food2.goods_rate - food1.goods_rate)
                 }
                 break
                 case 'rateLowToHigh': console.log('rateLowToHigh')
                 for(let cates of dataList){
-                    cates.food_list.sort((food1, food2) => food1.food_rate - food2.food_rate)
+                    cates.foods.sort((food1, food2) => food1.goods_rate - food2.goods_rate)
                 }
                 break
                 case 'salesHighToLow': console.log('salesHighToLow')
                 for(let cates of dataList){
-                    cates.food_list.sort((food1, food2) => food2.food_sale_count - food1.food_sale_count)
+                    cates.foods.sort((food1, food2) => food2.goods_amount - food1.goods_amount)
                 }
                 break
                 case 'salesLowToHigh': console.log('salesLowToHigh')
                 for(let cates of dataList){
-                    cates.food_list.sort((food1, food2) => food1.food_sale_count - food2.food_sale_count)
+                    cates.foods.sort((food1, food2) => food1.goods_amount - food2.goods_amount)
                 }
                 break
                 case 'priceHighToLow': console.log('priceHighToLow')
                 for(let cates of dataList){
-                    cates.food_list.sort((food1, food2) => food2.food_price - food1.food_price)
+                    cates.foods.sort((food1, food2) => food2.goods_price - food1.goods_price)
                 }
                 break
                 case 'priceLowToHigh': console.log('priceLowToHigh')
                 for(let cates of dataList){
-                    cates.food_list.sort((food1, food2) => food1.food_price - food2.food_price)
+                    cates.foods.sort((food1, food2) => food1.goods_price - food2.goods_price)
                 }
                 break
                 default: console.log('defaultSort')
@@ -359,13 +359,7 @@ export default {
                 alert("未达到起送价")
             }else{
                 console.log(this.cartList)
-                // let cartInfo = {
-                //     cartList: this.cartList,
-                //     foodTotalCount: this.foodTotalCount,
-                //     foodTotalPrice: this.foodTotalPrice
-                // }
-                // //将购物车信息放到本地存储
-                // Utils.storage.set('cartInfo', JSON.stringify(cartInfo))
+                
                 this.$router.push({path: '/pay'})
             }
         },
@@ -391,7 +385,7 @@ export default {
         getFoodList(){      //获取菜品信息
             this.$http.get(this.apiAddr+ 'goods/selectAll')
             .then((res) => {
-                // console.log(res)
+                console.log(res)
                 this.dataList = res.data
                 this.isLoading = false
             })

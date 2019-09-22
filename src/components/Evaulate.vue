@@ -5,9 +5,10 @@
             <el-collapse-item  v-for="(item, index) in commentsList" :key="index" :name="index">
                 <template slot="title">
                     <div class="item_inner">
-                        <img class="food_avatar" src="../assets/images/1.jpg" alt />
-                        <p class="food_name">菜名</p>
-                        <el-tag type="info" class="tag">未评价</el-tag>
+                        <img class="food_avatar" :src="foodInfos[index].foodImg" alt />
+                        <p class="food_name">{{foodInfos[index].foodName}}</p>
+                        <el-tag type="success" class="tag" v-if="item.comment_status">已评价</el-tag>
+                        <el-tag type="info" class="tag" v-else>未评价</el-tag>
                     </div>
                 </template>
                 <div class="write_evaluate" v-if="!item.comment_status">
@@ -43,7 +44,8 @@ export default {
     name: "evaluate",
     props: {
         commentsList: Array,
-        orderid: String
+        orderid: String,
+        foodInfos: Array
     },
     data() {
         return {
@@ -62,10 +64,13 @@ export default {
                 comment_content: this.commentsList[index].comment_content,
                 comment_rate: this.commentsList[index].comment_rate
             }
-            console.log(p)
+            // console.log(p)
             this.$http.post(`${this.apiAddr}comment/publishComment`, Qs.stringify(p))
             .then(res => {
                 console.log(res)
+                if(res.data.code == 200){
+                    this.commentsList[index].comment_status = 1
+                }
             })
         }
     }
