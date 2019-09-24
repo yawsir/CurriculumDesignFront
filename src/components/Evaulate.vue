@@ -5,7 +5,7 @@
             <el-collapse-item  v-for="(item, index) in commentsList" :key="index" :name="index">
                 <template slot="title">
                     <div class="item_inner">
-                        <img class="food_avatar" :src="foodInfos[index].foodImg" alt />
+                        <img class="food_avatar" :src="foodInfos[index].foodImg|imgUrlFilter" alt />
                         <p class="food_name">{{foodInfos[index].foodName}}</p>
                         <el-tag type="success" class="tag" v-if="item.comment_status">已评价</el-tag>
                         <el-tag type="info" class="tag" v-else>未评价</el-tag>
@@ -25,7 +25,7 @@
                 <div class="get_evaluation" v-else>
                     <div class="evaluate_score">
                         <p>评分</p>
-                        <el-rate :value="item.comment_rate" :max="5"  text-color="#ff9900"></el-rate>
+                        <el-rate :value="item.comment_rate" :max="5" :disabled="true" text-color="#ff9900"></el-rate>
                     </div>
                     <p class="evaluation_content">{{item.comment_content}}</p>
                 </div>

@@ -2,7 +2,6 @@
     <div id="pay">
         <h3>购物车</h3>
         <div class="order_info">
-            <p class="order_number">订单号：111111</p>
             <div class="info_pay">
                 <h5 class="title">菜品信息</h5>
                 <ul class="pay_header">
@@ -34,7 +33,8 @@
         </div>
         <div class="operate">
             <p class="user_address">收获地址:<span>{{userAddress}}</span></p>
-            <el-button type="primary" @click="submitOrder">提交订单</el-button>
+            <el-button type="primary" @click="cancelOrder" :disabled="isSubmit">取消订单</el-button>
+            <el-button type="primary" @click="submitOrder" :disabled="isSubmit">确认订单</el-button>
         </div>
         <div class="pay_way" v-show="isSubmit">
             <el-select v-model="payWay" placeholder="选择支付方式">
@@ -98,10 +98,23 @@ export default {
             this.$http.post(`${this.apiAddr}users/getUserInfo`,Qs.stringify(p))    //?user_id=cookie中的user_id
             .then((res) => {
                 console.log(res)
+                if(!res.data[0].user_address){
+                    this.getAlert('请设置收获地址','warning')
+                    this.$router.replace({path: '/home/person/account'})
+                    return
+                }
                 this.userAddress = res.data[0].user_address
             })    
         },
-        submitOrder(){  //点击提交订单
+        submitOrder(){  //点击确认订单
+            this.isSubmit = true
+            this.getAlert('订单已提交, 请支付','success')
+        },
+        cancelOrder(){  //取消订单
+            Utils.storage.remove('cartInfo')
+            this.$router.push({path: '/home/order'})
+        },
+        paidSuccess(){  //支付成功
             let foodListStr = ''
             for(let item of this.cartInfo.cartList){
                 foodListStr += item.food_id + ':' + item.num + ','
@@ -114,22 +127,20 @@ export default {
                 address: this.userAddress,
                 pay_method: this.payWay == 'ali' ? '支付宝' : '微信',
                 food_list: foodListStr
+
             }
             console.log(p)
             this.$http.post(`${this.apiAddr}order/commitOrder`,Qs.stringify(p))
             .then((res) => {
                 if(res.data.code == 200){   //订单提交成功 展示支付界面
-                    this.isSubmit = true
-                    this.getAlert('订单已提交','success')
                     Utils.storage.remove('cartInfo')
+                    this.getAlert('支付成功','success')
+                    this.$router.push({path: '/home/order'})
                 }
             })
+            
         },
-        paidSuccess(){  //支付成功
-            this.getAlert('支付成功','success')
-            this.$router.push({path: '/home/order'})
-        },
-        getAlert(message, type){
+        getAlert(message, type){    //弹窗
 			Message({
 				message,
 				type

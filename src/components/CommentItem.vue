@@ -1,7 +1,7 @@
 <template>
     <div class="comment-item">
         <div class="user-info">
-            <img src="../assets/images/3.jpg" alt class="user-avator" />
+            <img src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg" alt class="user-avator" />
         </div>
         <div class="user-comment">
             <p class="user-name">{{commentInfo.comment_user}}</p>

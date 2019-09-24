@@ -1,7 +1,7 @@
 <template>
     <div id="food_comments">
         <div class="inner">
-            <img class="big-pic" :src="food.img_src" alt="">
+            <img class="big-pic" :src="food.goods_picture|imgUrlFilter" alt="">
             <div class="food-detail">
                 <h5 class="food-name">{{food.goods_name}}</h5>
                 <div class="flex-wrap">

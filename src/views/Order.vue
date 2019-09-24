@@ -107,7 +107,7 @@
                         <h3 class="cate_title">{{item.catelog_name}}</h3>
                         <ul class="food_list clearfix">
                             <li class="food_item" v-for="(food, foodIndex) in item.foods" :key="foodIndex">
-                                <img :src="food.img_src" @click="getComments(food)"/>
+                                <img :src="food.goods_picture | imgUrlFilter" @click="getComments(food)"/>
                                 <div class="food_info">
                                     <p class="food_name">{{food.goods_name}}</p>
                                     <div class="foot_rate">
@@ -132,7 +132,7 @@
             <div class="search_food_list" v-show="searchMode">
                 <ul class="food_list clearfix">
                     <li class="food_item" v-for="(food, foodIndex) in searchList" :key="foodIndex">
-                        <img :src="food.goods_picture" @click="getComments(food)"/>
+                        <img :src="food.goods_picture|imgUrlFilter" @click="getComments(food)"/>
                         <div class="food_info">
                             <p class="food_name">{{food.goods_name}}</p>
                             <div class="foot_rate">
@@ -418,6 +418,7 @@ export default {
                     console.log(err)
                 })
             }else{
+                this.isLoading = false
                 this.searchMode = false
             }
         },
