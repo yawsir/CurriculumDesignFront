@@ -111,6 +111,30 @@ export default {
         }
     },
     methods: {
+		changeAccount(){		//注册时输入用户名
+			// console.log(this.signInInfo.account)
+			this.signUpAccountCanUse = false
+			if(this.signUpInfo.account !== ''){
+				this.$http.post(`${this.apiAddr}users/isExist`,
+					qs.stringify({
+						username:this.signUpInfo.account
+					})
+				)
+				.then((res) => {
+					// console.log(res)
+					if(res.data.code == 200){	//用户名可以使用
+						this.signUpAccountCanUse = true
+					}
+				})
+				.catch((err) => {
+					if(this.$http.isCancel(err)){
+						console.log('上次请求取消', err.message)
+					}else{
+						console.log(err)
+					}
+				})
+			}
+		},
         signInFormSubmit(){		//提交登录表单
             // console.log(this.signInInfo)
             this.getVerification((res) => {
@@ -165,40 +189,21 @@ export default {
 					}
 				})
 			}
-            
 		},
+
+
+
+
+
+
+		
 		//取消上一次ajax请求
 		cancelRequest(){
 			if(typeof this.cancelAjax ==='function'){
 				this.cancelAjax('终止请求'); //取消请求
 			}
     	},
-		changeAccount(){		//注册时输入用户名
-			// console.log(this.signInInfo.account)
-			this.signUpAccountCanUse = false
-			if(this.signUpInfo.account !== ''){
-				this.$http.post(`${this.apiAddr}users/isExist`,
-					qs.stringify({
-						username:this.signUpInfo.account
-					})
-				)
-				.then((res) => {
-					// console.log(res)
-					if(res.data.code == 200){
-						this.signUpAccountCanUse = true
-					}
-						
-					
-				})
-				.catch((err) => {
-					if(this.$http.isCancel(err)){
-						console.log('上次请求取消', err.message)
-					}else{
-						console.log(err)
-					}
-				})
-			}
-		},
+		
         //弹出验证码
         getVerification(callback, options){
             new TencentCaptcha('2015742382',callback,options).show()

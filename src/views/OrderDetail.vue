@@ -75,7 +75,8 @@ export default {
         getDetail(orderid){ //获取订单详情
             this.$http.get(`${this.apiAddr}order/orderDetail?order_id=${orderid}`) //
             .then((res) => {
-                // console.log(res)
+                console.log('订单')
+                console.log(res)
                 let foodInfos = []  //本单所有菜品的名字
                 for(let goods of res.data.goodsInfo){
                     foodInfos.push(
@@ -100,8 +101,8 @@ export default {
             // console.log(p)
             this.$http.post(`${this.apiAddr}comment/getOwnComment`, Qs.stringify(p))
             .then(res => {
-                // console.log(111)
-                // console.log(res)
+                console.log('评价')
+                console.log(res)
                 this.commentsList = res.data.food_list
             })
         }

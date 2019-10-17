@@ -91,6 +91,19 @@ export default {
                 })
             }
         },
+
+
+
+
+
+
+
+
+
+
+
+
+        
         //确认修改密码
         submitModify(formRef){
             this.$refs[formRef].validate((valid) => {
@@ -109,6 +122,7 @@ export default {
             }
             this.$http.post(`${this.apiAddr}users/getUserInfo`,Qs.stringify(p))    //?user_id=cookie中的user_id
             .then((res) => {
+                console.log('用户信息')
                 console.log(res)
                 this.userInfo = res.data[0]
             })    

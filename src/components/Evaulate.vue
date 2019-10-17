@@ -64,7 +64,7 @@ export default {
                 comment_content: this.commentsList[index].comment_content,
                 comment_rate: this.commentsList[index].comment_rate
             }
-            // console.log(p)
+            console.log(p)
             this.$http.post(`${this.apiAddr}comment/publishComment`, Qs.stringify(p))
             .then(res => {
                 console.log(res)
